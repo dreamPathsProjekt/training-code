@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: "2010-09-09"
+# Optional start
+Description: "Example template to create EC2 instance"
+Metadata:
+  Instances:
+    Description: "Web Server Instance"
+
+# input values from user when launching stack
+Parameters:
+  EnvType: # param name
+    Description: "Environment Type"
+    Type: String
+    AllowedValues:
+      - prod
+      - test
+
+Conditions:
+  CreateProdResources: !Equals [ !Ref EnvType,prod] # if EnvType equals prod then CreateProdResources
+
+# Optional end
+
+Mappings: # e.g. set user defined values based on region
+  RegionMap:
+    eu-west-1:
+      "ami": "ami-0bdb1d6c15a40392c"
+    mapping02:
+      key02:
+        Name: value02
+
+Trasform: # include snippets of code outside main template, e.g. lambda function, or template snippets
+  Name: 'AWS::Include'
+  Parameters:
+    Location: 's3://S3BucketName/MyFileName.yaml'
+
+Resources: # AWS Resources you are deploying
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      KeyName:
+      DisableApiTermination:
+      ImageId: ami-0bdb1d6c15a40392c
+      InstanceType: t2.micro
+      Monitoring: true
+      SecurityGroupIds:
+        - sg-id
+      Userdata: !Base64 |
+        #!/bin/bash -ex
+        # put your script here
+      Tags:
+        - Key: Environment
+          Value: production
+        - Key: Name
+          Value: m1.prod
+
+Outputs:
+  InstanceID:
+    Description: Instance ID
+    Value: !Ref EC2Instance
