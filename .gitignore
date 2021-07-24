@@ -1,0 +1,80 @@
+# Junk #
+########
+*.py[cod]
+*.egg-info
+.DS_Store
+
+# PyCharm
+.idea/
+.vscode/
+
+/bin
+/eggs
+/etc
+/parts
+/var
+/src
+/.virtualenv
+/develop-eggs
+/node_modules
+
+/coverage
+/.coverage
+
+/.installed.cfg
+/.mr.developer.cfg
+/local*.cfg
+
+/enable_*
+
+/.project
+/.pydevproject
+
+# NetBeans
+/nbproject
+
+# Sublime Text
+/*.sublime-*
+/.codeintel
+/data
+
+# Emacs
+\#*#
+
+# Working files/folders
+/-*
+
+# Magix
+.delivery
+.terraform
+
+# Secrets
+secrets
+env/
+*.env
+*.key
+*.crt
+*.pem
+*.pub
+.deployment.log
+.jointoken.txt
+*.bak
+.dockerconfigjson
+
+# Terraform
+.environment/
+.terraform*/
+terraform.tfvars
+*.env
+*.tfstate
+*.tfstate.*
+*.tfplan
+*.secrets.tfvars
+*.backend.tfvars
+*.sql
+
+# Doit
+.doit.*
+
+# Sqlite3
+db.sqlite3*
