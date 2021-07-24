@@ -9,7 +9,7 @@ from tortoise.contrib.fastapi import register_tortoise
 from typing import Optional
 
 from .models import City, CityInSerializer, CitySerializer
-from .containers import get_containers
+from .containers import containers_list
 
 
 app = FastAPI()
@@ -89,13 +89,12 @@ async def delete_cities(city_id: int):
     return {}
 
 
-@app.get('/containers/{input}')
-async def get_containers(input: str, background_tasks: BackgroundTasks):
-    background_tasks.add_task(get_containers)
+@app.get('/containers')
+async def get_containers(background_tasks: BackgroundTasks):
+    background_tasks.add_task(containers_list)
     return {
         'result': 'Task sent, check your app logs.',
-        'tasks': background_tasks.tasks,
-        'input': input
+        'tasks': background_tasks.tasks
     }
 
 
