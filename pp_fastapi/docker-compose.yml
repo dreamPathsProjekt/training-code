@@ -7,3 +7,6 @@ services:
     image: pp_fastapi:0.1
     ports:
       - 8000:8000
+    volumes:
+      - ./cities:/usr/src/app/cities
+    command: "hypercorn --bind 0.0.0.0:8000 --reload cities.main:app"

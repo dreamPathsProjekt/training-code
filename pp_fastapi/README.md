@@ -2,6 +2,8 @@
 
 ## Install
 
+> NOTE: Do not try to run this from WSL, aiohttp is blocking.
+
 Requires: Python 3.6+
 Repo: Python 3.9.1
 

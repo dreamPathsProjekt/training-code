@@ -50,14 +50,14 @@ async def get_cities():
 
     global session
     # Asyncio gather tasks method
-    tasks = [asyncio.create_task(City.set_current_time(city, session)) for city in cities_all]
-    print(tasks)
-    await asyncio.gather(*tasks)
-    return cities_all
+    # tasks = [asyncio.create_task(City.set_current_time(city, session)) for city in cities_all]
+    # print(tasks)
+    # await asyncio.gather(*tasks)
+    # return cities_all
 
     # Asyncio wait method
-    # await asyncio.wait([City.set_current_time(city, session) for city in cities_all])
-    # return cities_all
+    await asyncio.wait([City.set_current_time(city, session) for city in cities_all])
+    return cities_all
 
 
 @app.get('/cities/{city_id}')
