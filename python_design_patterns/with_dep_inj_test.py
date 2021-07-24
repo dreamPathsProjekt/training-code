@@ -1,7 +1,7 @@
 import unittest
 from io import StringIO
 from unittest.mock import patch
-from with_dep_inj import *
+from .with_dep_inj import Authorizer_SMS, PaymentProcessor, Order
 
 class Authorizer_SMS_TestCase(unittest.TestCase):
 

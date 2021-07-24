@@ -2,7 +2,7 @@ import unittest
 from io import StringIO
 from unittest.mock import patch
 
-from final import *
+from .final import *
 
 
 class Authorizer_SMS_TestCase(unittest.TestCase):
