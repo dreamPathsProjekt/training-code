@@ -1,0 +1,9 @@
+version: '3.7'
+
+services:
+  web:
+    build:
+      context: .
+    image: pp_fastapi:0.1
+    ports:
+      - 8000:8000
