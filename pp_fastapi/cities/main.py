@@ -1,12 +1,15 @@
 import aiohttp
 import asyncio
-from fastapi import FastAPI
+import logging
+from fastapi import FastAPI, BackgroundTasks
+from fastapi.logger import logger
 # from pydantic import BaseModel
 # Register tortoise models to FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from typing import Optional
 
 from .models import City, CityInSerializer, CitySerializer
+from .containers import get_containers
 
 
 app = FastAPI()
@@ -18,6 +21,8 @@ DB_URL = 'sqlite://db.sqlite3'
 #     timezone: str
 
 session: Optional[aiohttp.ClientSession] = None
+logger.setLevel(logging.INFO)
+
 
 @app.on_event('startup')
 async def startup_event() -> None:
@@ -51,7 +56,6 @@ async def get_cities():
     global session
     # Asyncio gather tasks method
     # tasks = [asyncio.create_task(City.set_current_time(city, session)) for city in cities_all]
-    # print(tasks)
     # await asyncio.gather(*tasks)
     # return cities_all
 
@@ -83,6 +87,15 @@ async def create_cities(city: CityInSerializer):
 async def delete_cities(city_id: int):
     await City.filter(id=city_id).delete()
     return {}
+
+
+@app.get('/containers')
+async def get_containers(background_tasks: BackgroundTasks):
+    background_tasks.add_task(get_containers)
+    return {
+        'result': 'Task sent, check your app logs.',
+        'tasks': background_tasks.tasks
+    }
 
 
 register_tortoise(

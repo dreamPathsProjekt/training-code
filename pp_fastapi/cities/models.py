@@ -1,5 +1,6 @@
 import requests
 import aiohttp
+from fastapi.logger import logger
 from tortoise.models import Model
 from tortoise import fields
 # Replace pydantic serializer with tortoise helper
@@ -29,7 +30,7 @@ class City(Model):
     async def set_current_time(cls, instance: 'City', session: aiohttp.ClientSession):
         async with session.get(f'{WORLD_TIME_API_BASE_URL}/{instance.timezone}') as response:
             result = await response.json()
-            print(result)
+            logger.info(result)
             current_time = result.get('datetime')
             instance.current_time = current_time
 
