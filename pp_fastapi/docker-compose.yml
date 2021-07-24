@@ -8,8 +8,5 @@ services:
     ports:
       - 8000:8000
     volumes:
-      - ./cities:/usr/src/app/cities
-      - ./db.sqlite3:/usr/src/app/db.sqlite3
-      - ./db.sqlite3-shm:/usr/src/app/db.sqlite3-shm
-      - ./db.sqlite3-wal:/usr/src/app/db.sqlite3-wal
+      - ./:/usr/src/app
     command: "hypercorn --bind 0.0.0.0:8000 --reload cities.main:app"
