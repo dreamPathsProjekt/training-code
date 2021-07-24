@@ -62,10 +62,11 @@ async def get_cities():
 
 @app.get('/cities/{city_id}')
 async def get_cities_id(city_id: int):
-    # Both formats are awaitable
-    # queryset_single = City.get(id=city_id)
-    # return await CitySerializer.from_queryset_single(queryset=queryset_single)
-    return await CitySerializer.from_queryset_single(queryset=City.get(id=city_id))
+    city = await CitySerializer.from_queryset_single(queryset=City.get(id=city_id))
+
+    global session
+    await asyncio.wait([City.set_current_time(city, session)])
+    return city
 
 
 # Input: CityInSerializer

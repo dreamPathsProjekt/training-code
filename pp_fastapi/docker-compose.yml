@@ -8,5 +8,6 @@ services:
     ports:
       - 8000:8000
     volumes:
+      # Persist sqlite & reload app on code changes
       - ./:/usr/src/app
     command: "hypercorn --bind 0.0.0.0:8000 --reload cities.main:app"
