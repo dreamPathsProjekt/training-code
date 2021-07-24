@@ -89,12 +89,13 @@ async def delete_cities(city_id: int):
     return {}
 
 
-@app.get('/containers')
-async def get_containers(background_tasks: BackgroundTasks):
+@app.get('/containers/{input}')
+async def get_containers(input: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(get_containers)
     return {
         'result': 'Task sent, check your app logs.',
-        'tasks': background_tasks.tasks
+        'tasks': background_tasks.tasks,
+        'input': input
     }
 
 
