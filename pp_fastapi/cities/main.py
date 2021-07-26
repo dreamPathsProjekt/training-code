@@ -81,14 +81,29 @@ async def token(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User authentication failed')
     user_object = UserSerializer.from_tortoise_orm(user)
-    token = jwt.encode(user_object.id + user_object.username, JWT_SECRET)
+    token = jwt.encode({'id': user_object.id, 'username': user_object.username}, JWT_SECRET)
     return {'access_token': token, 'token_type': 'bearer'}
+
+
+# OAuth2 scheme lock plumbing, using dependency injection.
+async def get_current_user(token: str = Depends(oauth2_scheme)):
+    try:
+        payload = jwt.decode(token, JWT_SECRET, algorithms=['HS256'])
+        user = await User.get(id=payload.get('id'))
+    except:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User authentication failed')
+    return await UserSerializer.from_tortoise_orm(user)
 
 
 @app.post('/users', status_code=status.HTTP_201_CREATED, response_model=UserSerializer)
 async def create_user(user: UserInSerializer):
     user_object = await User.create(username=user.username, password=bcrypt_sha256.hash(user.password))
     return await UserSerializer.from_tortoise_orm(user_object)
+
+
+@app.get('/user/me', response_model=UserSerializer)
+async def get_user(user: UserSerializer = Depends(get_current_user)):
+    return user
 
 
 @app.get('/cities')
