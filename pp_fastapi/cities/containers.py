@@ -16,8 +16,8 @@ def container_logs(container_id: str):
     if not container:
         logs = {}
     else:
-        logs = container.logs()
-    logger.info(pprint.pprint(logs.encode()))
+        logs = str(container.logs())
+    logger.info(pprint.pprint(logs))
 
     with open(f'{container_id}.json', mode='w') as logfile:
         json.dump(json.loads(logs), logfile)
