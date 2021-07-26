@@ -1,6 +1,7 @@
 import docker
 import pprint
 from fastapi.logger import logger
+from fastapi.exceptions import HTTPException
 
 
 def list_containers() -> list:
@@ -12,5 +13,8 @@ def list_containers() -> list:
 def container_logs(container_id: str):
     client = docker.from_env()
     container = client.containers.get(container_id)
-    logs = container.logs()
+    if not container:
+        logs = ''
+    else:
+        logs = container.logs()
     logger.info(pprint.pprint(logs))
