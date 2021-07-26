@@ -93,7 +93,7 @@ async def delete_cities(city_id: int):
 
 
 @app.get('/containers')
-async def get_containers():
+def get_containers():
     return list_containers()
 
 
