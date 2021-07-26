@@ -1,8 +1,6 @@
 import aiohttp
 import asyncio
 import logging
-import os
-import inspect
 
 from fastapi import FastAPI, BackgroundTasks, HTTPException, status
 from fastapi.logger import logger
@@ -13,12 +11,12 @@ from tortoise.contrib.fastapi import register_tortoise
 from typing import Optional
 
 from .models import City, CityInSerializer, CitySerializer
-from .containers import list_containers, container_logs
+from .containers import list_containers, container_logs, BASE_DIR, os
 
 
 app = FastAPI()
 DB_URL = 'sqlite://db.sqlite3'
-BASE_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
+
 
 # NOTE: Deprecated
 # class City(BaseModel):

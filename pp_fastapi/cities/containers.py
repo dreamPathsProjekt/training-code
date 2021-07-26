@@ -1,7 +1,10 @@
 import docker
 import pprint
-import json
+import os
+import inspect
 from fastapi.logger import logger
+
+BASE_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 
 def list_containers() -> list:
@@ -19,5 +22,6 @@ def container_logs(container_id: str):
         logs = str(container.logs())
     logger.info(pprint.pprint(logs))
 
-    with open(f'{container_id}.log', mode='w') as logfile:
+    filepath = os.path.join(BASE_DIR, f'{container_id}.log')
+    with open(filepath, mode='w') as logfile:
         logfile.write(logs)
