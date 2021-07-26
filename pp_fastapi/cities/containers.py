@@ -13,4 +13,4 @@ def container_logs(container_id: str):
     client = docker.from_env()
     container = client.containers.get(container_id)
     logs = container.logs()
-    logger(pprint.pprint(logs))
+    logger.info(pprint.pprint(logs))
