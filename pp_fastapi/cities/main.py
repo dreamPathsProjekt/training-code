@@ -2,22 +2,26 @@ import aiohttp
 import asyncio
 import logging
 
+import jwt
+
 from fastapi import FastAPI, BackgroundTasks, HTTPException, status, Depends
 from fastapi.logger import logger
 from fastapi.responses import FileResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from passlib.hash import bcrypt_sha256
 
 # from pydantic import BaseModel
 # Register tortoise models to FastAPI
 from tortoise.contrib.fastapi import register_tortoise
 from typing import Optional
 
-from .models import City, CityInSerializer, CitySerializer
+from .models import City, CityInSerializer, CitySerializer, User, UserSerializer, UserInSerializer
 from .containers import list_containers, container_logs, BASE_DIR, os
 
 
 app = FastAPI()
 DB_URL = 'sqlite://db.sqlite3'
+JWT_SECRET = 'pokUk2VSTrJ1cSImF6do'
 
 
 # NOTE: Deprecated
@@ -52,17 +56,39 @@ async def shutdown_event() -> None:
 
 @app.get('/')
 def index():
-    return {'key': 'value'}
+    return {'message': 'Hello!'}
+
+
+async def authenticate_user(username: str, password: str):
+    user = await User.get(username=username)
+    if not user:
+        return False
+    if not user.verify_password(password):
+        return False
+    return user
 
 
 @app.post('/token')
-# Dependency injection using Depends() on form_data
+# Dependency injection using Depends() on form_data - no params Depends() -> depends on annotated class.
 # If OAuth2PasswordRequestForm fails, function won't run
 # Authenticate only /container endpoints
 # Needs package: pip install python-multipart
-def token(form_data: OAuth2PasswordRequestForm = Depends()):
-    # Very insecure example, demo only
-    return {'access_token': f'{form_data.username}token'}
+async def token(form_data: OAuth2PasswordRequestForm = Depends()):
+    user = await authenticate_user(
+        username=form_data.username,
+        password=form_data.password
+    )
+    if not user:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User authentication failed')
+    user_object = UserSerializer.from_tortoise_orm(user)
+    token = jwt.encode(user_object.id + user_object.username, JWT_SECRET)
+    return {'access_token': token, 'token_type': 'bearer'}
+
+
+@app.post('/users', status_code=status.HTTP_201_CREATED, response_model=UserSerializer)
+async def create_user(user: UserInSerializer):
+    user_object = await User.create(username=user.username, password=bcrypt_sha256.hash(user.password))
+    return await UserSerializer.from_tortoise_orm(user_object)
 
 
 @app.get('/cities')

@@ -46,4 +46,5 @@ FastAPI with async functionality, things that play well integrated:
 6. [FastAPI OAuth2, JWT](https://www.youtube.com/watch?v=6hTRw_HK3Ts)
 7. [FastAPI Docs](https://fastapi.tiangolo.com/)
 8. [FastAPI Performance Deployment](https://fastapi.tiangolo.com/deployment/docker/)
-9. [Full-stack FastAPI-Vue-Postgresql repo](https://github.com/tiangolo/full-stack-fastapi-postgresql)
+9. [FastAPI Dependency Injection](https://fastapi.tiangolo.com/tutorial/dependencies/)
+10. [Full-stack FastAPI-Vue-Postgresql repo](https://github.com/tiangolo/full-stack-fastapi-postgresql)

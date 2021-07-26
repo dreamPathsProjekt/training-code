@@ -5,9 +5,19 @@ from tortoise.models import Model
 from tortoise import fields
 # Replace pydantic serializer with tortoise helper
 from tortoise.contrib.pydantic import pydantic_model_creator
+from passlib.hash import bcrypt_sha256
 
 
 WORLD_TIME_API_BASE_URL = 'http://worldtimeapi.org/api/timezone'
+
+
+class User(Model):
+    id = fields.UUIDField(pk=True)
+    username = fields.CharField(max_length=50, unique=True)
+    password = fields.CharField(max_length=128)
+
+    def verify_password(self, password: str):
+        return bcrypt_sha256.verify(password, self.password)
 
 
 class City(Model):
@@ -42,3 +52,5 @@ class City(Model):
 CitySerializer = pydantic_model_creator(City, name='City')
 # Incoming data helper, post serializer to exclude readonly fields, e.g. id
 CityInSerializer = pydantic_model_creator(City, name='CityIn', exclude_readonly=True)
+UserSerializer = pydantic_model_creator(User, name='User')
+UserInSerializer = pydantic_model_creator(User, name='UserIn', exclude_readonly=True)
