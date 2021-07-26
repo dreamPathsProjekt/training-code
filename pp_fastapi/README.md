@@ -48,3 +48,4 @@ FastAPI with async functionality, things that play well integrated:
 8. [FastAPI Performance Deployment](https://fastapi.tiangolo.com/deployment/docker/)
 9. [FastAPI Dependency Injection](https://fastapi.tiangolo.com/tutorial/dependencies/)
 10. [Full-stack FastAPI-Vue-Postgresql repo](https://github.com/tiangolo/full-stack-fastapi-postgresql)
+11. [Mix Django with FastAPI](https://www.reddit.com/r/django/comments/jbsjbv/i_mix_django_with_fastapi_for_fun_and_discover/)
