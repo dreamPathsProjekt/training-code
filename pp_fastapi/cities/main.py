@@ -153,7 +153,8 @@ def get_containers(token: str = Depends(oauth2_scheme)):
 
 
 @app.get('/containers/{container_id}/logs', status_code=status.HTTP_201_CREATED)
-async def get_containers_logs(container_id: str, background_tasks: BackgroundTasks):
+async def get_containers_logs(container_id: str, background_tasks: BackgroundTasks, token: str = Depends(oauth2_scheme)):
+    logger.info(f'User login on /containers/{container_id}/logs with token {token}')
     background_tasks.add_task(container_logs, container_id)
     return {
         'result': f'Task logs sent to container {container_id}, check your app logs.',
@@ -163,7 +164,8 @@ async def get_containers_logs(container_id: str, background_tasks: BackgroundTas
 
 # Use responses to control swagger documentation, media_type
 @app.get('/containers/{container_id}/file', responses={200: {"content": {"text/plain": {"example": "No example. Downloads file."}}}})
-async def get_containers_logs_file(container_id: str):
+async def get_containers_logs_file(container_id: str, token: str = Depends(oauth2_scheme)):
+    logger.info(f'User login on /containers/{container_id}/file with token {token}')
     filepath = os.path.join(BASE_DIR, f'{container_id}.log')
     if not os.path.exists(filepath):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'File {container_id}.log not Found')
