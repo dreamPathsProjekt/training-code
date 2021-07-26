@@ -2,9 +2,11 @@ import aiohttp
 import asyncio
 import logging
 
-from fastapi import FastAPI, BackgroundTasks, HTTPException, status
+from fastapi import FastAPI, BackgroundTasks, HTTPException, status, Depends
 from fastapi.logger import logger
 from fastapi.responses import FileResponse
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+
 # from pydantic import BaseModel
 # Register tortoise models to FastAPI
 from tortoise.contrib.fastapi import register_tortoise
@@ -25,6 +27,7 @@ DB_URL = 'sqlite://db.sqlite3'
 
 session: Optional[aiohttp.ClientSession] = None
 logger.setLevel(logging.INFO)
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl='token')
 
 
 @app.on_event('startup')
@@ -50,6 +53,16 @@ async def shutdown_event() -> None:
 @app.get('/')
 def index():
     return {'key': 'value'}
+
+
+@app.post('/token')
+# Dependency injection using Depends() on form_data
+# If OAuth2PasswordRequestForm fails, function won't run
+# Authenticate only /container endpoints
+# Needs package: pip install python-multipart
+def token(form_data: OAuth2PasswordRequestForm = Depends()):
+    # Very insecure example, demo only
+    return {'access_token': f'{form_data.username}token'}
 
 
 @app.get('/cities')
@@ -93,7 +106,8 @@ async def delete_cities(city_id: int):
 
 
 @app.get('/containers')
-def get_containers():
+def get_containers(token: str = Depends(oauth2_scheme)):
+    logger.info(f'User login on /containers with token {token}')
     return list_containers()
 
 
