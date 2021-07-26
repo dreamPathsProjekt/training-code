@@ -110,10 +110,10 @@ async def get_containers_logs(container_id: str, background_tasks: BackgroundTas
 
 @app.get('/containers/{container_id}/file')
 async def get_containers_logs_file(container_id: str):
-    filepath = os.path.join(BASE_DIR, f'{container_id}.json')
+    filepath = os.path.join(BASE_DIR, f'{container_id}.log')
     if not os.path.exists(filepath):
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'File {container_id}.json not Found')
-    return FileResponse(filepath, media_type='application/json')
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'File {container_id}.log not Found')
+    return FileResponse(filepath, media_type='text/plain')
 
 
 register_tortoise(

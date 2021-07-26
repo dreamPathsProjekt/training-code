@@ -14,10 +14,10 @@ def container_logs(container_id: str):
     client = docker.from_env()
     container = client.containers.get(container_id)
     if not container:
-        logs = {}
+        logs = ''
     else:
         logs = str(container.logs())
     logger.info(pprint.pprint(logs))
 
-    with open(f'{container_id}.json', mode='w') as logfile:
-        json.dump(json.loads(logs), logfile)
+    with open(f'{container_id}.log', mode='w') as logfile:
+        logfile.write(logs)
