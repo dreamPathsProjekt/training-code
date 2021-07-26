@@ -81,7 +81,7 @@ async def token(form_data: OAuth2PasswordRequestForm = Depends()):
     if not user:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail='User authentication failed')
     user_object = await UserSerializer.from_tortoise_orm(user)
-    token = jwt.encode({'id': user_object.id, 'username': user_object.username}, JWT_SECRET)
+    token = jwt.encode({'id': str(user_object.id), 'username': user_object.username}, JWT_SECRET)
     return {'access_token': token, 'token_type': 'bearer'}
 
 
