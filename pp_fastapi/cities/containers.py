@@ -1,7 +1,7 @@
 import docker
 import pprint
+import json
 from fastapi.logger import logger
-from fastapi.exceptions import HTTPException
 
 
 def list_containers() -> list:
@@ -14,7 +14,10 @@ def container_logs(container_id: str):
     client = docker.from_env()
     container = client.containers.get(container_id)
     if not container:
-        logs = ''
+        logs = {}
     else:
         logs = container.logs()
-    logger.info(pprint.pprint(logs))
+    logger.info(pprint.pprint(logs.encode()))
+
+    with open(f'{container_id}.json', mode='w') as logfile:
+        json.dump(json.loads(logs), logfile)

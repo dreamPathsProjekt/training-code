@@ -1,7 +1,10 @@
 import aiohttp
 import asyncio
 import logging
-from fastapi import FastAPI, BackgroundTasks
+import os
+import inspect
+
+from fastapi import FastAPI, BackgroundTasks, HTTPException, status
 from fastapi.logger import logger
 from fastapi.responses import FileResponse
 # from pydantic import BaseModel
@@ -15,6 +18,7 @@ from .containers import list_containers, container_logs
 
 app = FastAPI()
 DB_URL = 'sqlite://db.sqlite3'
+BASE_DIR = os.path.dirname(os.path.abspath(inspect.getfile(inspect.currentframe())))
 
 # NOTE: Deprecated
 # class City(BaseModel):
@@ -77,7 +81,7 @@ async def get_cities_id(city_id: int):
 # Input: CityInSerializer
 # Output: CitySerializer
 # Tortoise model: City
-@app.post('/cities')
+@app.post('/cities', status_code=status.HTTP_201_CREATED)
 async def create_cities(city: CityInSerializer):
     # exclude_unset to auto-increment ids
     city_object = await City.create(**city.dict(exclude_unset=True))
@@ -95,13 +99,21 @@ async def get_containers():
     return list_containers()
 
 
-@app.get('/containers/{container_id}/logs')
+@app.get('/containers/{container_id}/logs', status_code=status.HTTP_201_CREATED)
 async def get_containers_logs(container_id: str, background_tasks: BackgroundTasks):
     background_tasks.add_task(container_logs, container_id)
     return {
         'result': f'Task logs sent to container {container_id}, check your app logs.',
         'tasks': background_tasks.tasks
     }
+
+
+@app.get('/containers/{container_id}/file')
+async def get_containers_logs_file(container_id: str):
+    filepath = os.path.join(BASE_DIR, f'{container_id}.json')
+    if not os.path.exists(filepath):
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail=f'File {container_id}.json not Found')
+    return FileResponse(filepath, media_type='application/json')
 
 
 register_tortoise(
