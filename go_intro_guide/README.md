@@ -42,6 +42,10 @@
   - `internal` contains privately used code [https://dave.cheney.net/2019/10/06/use-internal-packages-to-reduce-your-public-api-surface](https://dave.cheney.net/2019/10/06/use-internal-packages-to-reduce-your-public-api-surface)
   - `internal/` is a special directory name recognised by the go tool which will prevent one package from being imported by another unless both share a common ancestor.
 
+#### Variables/Functions
+
+- Variables can be __initialized__ outside of a function, but cannot be __assigned__ a value. __No globals__ permitted.
+
 ### GRPC MAsterclass
 
 - [https://www.udemy.com/course/grpc-golang](https://www.udemy.com/course/grpc-golang)
