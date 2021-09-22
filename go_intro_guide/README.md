@@ -42,9 +42,29 @@
   - `internal` contains privately used code [https://dave.cheney.net/2019/10/06/use-internal-packages-to-reduce-your-public-api-surface](https://dave.cheney.net/2019/10/06/use-internal-packages-to-reduce-your-public-api-surface)
   - `internal/` is a special directory name recognised by the go tool which will prevent one package from being imported by another unless both share a common ancestor.
 
-#### Variables/Functions
+#### Deeper: Variables/Functions/Slices/Types
 
 - Variables can be __initialized__ outside of a function, but cannot be __assigned__ a value. __No globals__ permitted.
+- `append()` function for slices does not append new elements to existing slice, but returns a new slice (we usually assign the new slice to the same variable)
+
+```Go
+cards := []string{}
+
+// Append takes initial cards slice as input, appends element and returns new slice, that we assign on cards variable.
+cards = append(cards, "Six of Spades")
+```
+
+- Go documentation on `append()`
+
+```Go
+// The append built-in function appends elements to the end of a slice. If it has sufficient capacity, the destination is resliced to accommodate the new elements. If it does not, a new underlying array will be allocated. Append returns the updated slice. It is therefore necessary to store the result of append, often in the variable holding the slice itself:
+
+slice = append(slice, elem1, elem2)
+slice = append(slice, anotherSlice...)
+// As a special case, it is legal to append a string to a byte slice, like this:
+
+slice = append([]byte("hello "), "world"...)
+```
 
 ### GRPC MAsterclass
 
@@ -53,3 +73,14 @@
 ### Go Serverless
 
 - [https://www.udemy.com/course/hands-on-serverless-computing-with-go](https://www.udemy.com/course/hands-on-serverless-computing-with-go)
+
+## Configuration & VSCode issues
+
+- Any Go package, needs `go mod init` when using `go1.15+`. This resolves `undeclared name` errors with code not using modules.
+- To resolve the VsCode `gopls` issue with __multiple modules per workspace folder__ (stable version does not allow multiple modules in a single folder under a `.vscode` workspace) add the following configuration to __workspace__ `settings.json`
+
+```JSON
+"gopls": {
+  "experimentalWorkspaceModule": true,
+}
+```
