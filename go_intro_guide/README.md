@@ -66,6 +66,8 @@ slice = append(slice, anotherSlice...)
 slice = append([]byte("hello "), "world"...)
 ```
 
+- __Naming convention__ Receiver instances to be 1 or at-most 2 letter names
+
 ### GRPC MAsterclass
 
 - [https://www.udemy.com/course/grpc-golang](https://www.udemy.com/course/grpc-golang)
