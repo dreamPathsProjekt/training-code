@@ -66,7 +66,82 @@ slice = append(slice, anotherSlice...)
 slice = append([]byte("hello "), "world"...)
 ```
 
+- Subset (range) of slice (similar to Python) returns new slices
+
+```Go
+var fruits []string
+
+// Select subset from and including index 0 up to and not including index 2
+// Selects items fruits[0], fruits[1]
+fruits[0:2]
+
+// Select from start of the slice up to and not including index 2
+fruits[:2]
+// Select from index and include 2 up to and including the end of the slice.
+fruits[2:]
+```
+
+- Multiple return values from function
+
+```Go
+// You can have arbitratrily multiple return values from a single function
+func deal(d deck, handSize int) (deck, deck) {
+  return d[:handSize], d[handSize:]
+}
+```
+
 - __Naming convention__ Receiver instances to be 1 or at-most 2 letter names
+- __Type conversion__
+
+```Go
+// Syntax type(value)
+
+// Example string to byteslice (all characters into slice of bytes)
+greeting := "Hello world"
+[]byte(greeting)
+```
+
+- I/O Write file __permissions__ parameter, is only used when the file __doesn't exist__
+
+```Go
+import "io/ioutil"
+
+// If file out.txt doesn't exist, create a new file with Linux permissions 0666 - Anyone can read and write (no execute)
+filename := "out.txt"
+err := ioutil.WriteFile(filename, []byte("Helloworld"), 0666)
+```
+
+- __Shuffle__ a slice - no std library package
+
+```Go
+// Algorithm: For each index, element in slice
+// Generate a randomNumber between 0 and len(slice) - 1
+// Swap current element with slice[randomNumber]
+
+import (
+  "math/rand"
+  "time"
+)
+
+type deck []string
+
+func (d deck) shuffle() {
+  // Optional random number generation. Default Source type (interface) can be used, but randomization sequence happens in the same way, for subsequent runs.
+  // Why: Default Source struct uses the same exact seed value (source of randomness). This is due to Source struct initialization.
+  source := rand.NewSource(time.Now().UnixNano())
+  // Creates new Rand type object.
+  r := rand.New(source)
+
+// We only care for the index not card.
+  for i := range d {
+    // Intn takes param as range of integers from 0 - a non-negative pseudo-random number in [0,n). It panics if n <= 0.
+    newPosition := r.Intn(len(d) - 1)
+
+    // This swap is valid in Go (similar to Python)
+    d[i], d[newPosition] = d[newPosition], d[i]
+  }
+}
+```
 
 ### GRPC MAsterclass
 
@@ -84,5 +159,29 @@ slice = append([]byte("hello "), "world"...)
 ```JSON
 "gopls": {
   "experimentalWorkspaceModule": true,
+}
+```
+
+## Interesting SO Questions
+
+- [Named Function Arguments](https://stackoverflow.com/questions/23447217/go-named-arguments) - Fo refactor reasons, it's always better to refactor long lists of arguments with __structs__
+- [No default values/method overloading supported](https://stackoverflow.com/questions/2032149/optional-parameters-in-go)
+
+```Go
+// Go supports pack/unpack functions that accept/return the same argument signatures
+
+// Args returns 3 int values
+func Args() (a int, b int, c int) {
+    return 1,2,3
+}
+
+// Bar accepts 3 int parameters
+func Bar(a,b,c int) {
+    fmt.Println(a,b,c)
+}
+
+// Unpack Args inside Bar call - supported
+func main() {
+    Bar(Args())
 }
 ```
