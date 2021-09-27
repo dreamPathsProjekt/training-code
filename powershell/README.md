@@ -4,6 +4,27 @@
 - [PowershellMC Repo](https://github.com/johnthebrit/PowerShellMC)
 - [All cmdlets Referenced](https://github.com/johnthebrit/PowerShellMC/blob/master/Sample.ps1)
 
+- [Powershell Masterclass](#powershell-masterclass)
+  - [Fundamentals](#fundamentals)
+    - [Install PS Core (7.1) on Windows](#install-ps-core-71-on-windows)
+    - [Set own PS Tab Complete Function](#set-own-ps-tab-complete-function)
+    - [Show alias cmdlets](#show-alias-cmdlets)
+    - [Filesystem navigation](#filesystem-navigation)
+    - [Powershell Modules - Help](#powershell-modules---help)
+  - [Pipeline - Pass Objects - OO Tricks](#pipeline---pass-objects---oo-tricks)
+    - [Semicolon - Multiple cmds on one line](#semicolon---multiple-cmds-on-one-line)
+    - [External APIs (normal commands) use with PS - Text manipulation](#external-apis-normal-commands-use-with-ps---text-manipulation)
+    - [PS Variables](#ps-variables)
+    - [Pipelines](#pipelines)
+    - [Metrics, Filtering & Querying](#metrics-filtering--querying)
+    - [Comparing sets of data](#comparing-sets-of-data)
+    - [Advanced Output](#advanced-output)
+    - [Using Objects - WhatIf](#using-objects---whatif)
+  - [Mount Azure as PSDrive](#mount-azure-as-psdrive)
+  - [AzureAD Module - Currently stable only on 5.1](#azuread-module---currently-stable-only-on-51)
+  - [Powershell Remote](#powershell-remote)
+    - [Invoke command](#invoke-command)
+
 ## Fundamentals
 
 - All cmdlets in PS get input and produce output as objects. The output is not textual (as in Unix shell, or cmd) and also pipes are sequences of operations (messages in Smalltalk lingo) between live objects.
