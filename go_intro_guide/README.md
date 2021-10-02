@@ -143,6 +143,115 @@ func (d deck) shuffle() {
 }
 ```
 
+#### Structs & Pointers
+
+- String formatted output of struct
+
+```Go
+var alex person
+
+// %+v outputs all field names and values
+fmt.Printf("%+v", alex)
+
+// Structs can be updated as (alternative to literal notation)
+alex.firstName = "Alex"
+alex.lastName = "Anderson"
+```
+
+- Struct embedding & function receivers updates
+
+```Go
+type contactInfo struct {
+  email   string
+  zipCode int
+}
+
+// Compositional way - Can only use contact fields and methods (receiver functions) by using contact field.
+type person struct {
+  firstName string
+  lastName  string
+  contact   contactInfo
+}
+
+// Embedding (anonymous field) - Implicitly the field name is called contactInfo. Allows to raise embedded fields & methods (receiver functions).
+type personEmbed struct {
+  firstName string
+  lastName  string
+  contactInfo
+}
+
+// Instance cannot be updated since p is passed by value. The p VALUE (copy) is updated.
+// It needs a pointer receiver of person to update the instance.
+func (p person) updateName(name string) {
+  p.firstName = name
+}
+
+func (p *person) updateNamePointer(name string) {
+  // *p = give me access to the instance, the pointer points at
+  // Parethenses are used to avoid doing pointer operation on field firstName (precedence)
+  // Example *p.firstName does the pointer value operation on p.firstName variable
+  // (*p).firstName does the pointer value operation on p and then accesses firstName.
+  (*p).firstName = name
+}
+
+func main() {
+  jim := person{}
+  jim.firstName = "Jim"
+  jim.updateName("Jimmy")
+  println(jim.firstName)
+  // output is still "Jim"
+
+  // & gives the memory address of the variable
+  // * gives the value a memory address (pointer) is pointing at
+  // * on function signatures (receivers/arguments), it means pointer of type
+  jimPointer := &jim
+  jimPointer.updateNamePointer("Jimmy")
+  println(jim.firstName)
+  // output is "Jimmy"
+
+  // Pointer shortcut - equivalent without variable holding pointer to jim
+  // This works because a pointer receiver of a type can also accept the type itself.
+  // Implicitly it is inferred that the address of the type should be used.
+  jim.updateNamePointer()
+  println(jim.firstName)
+  // output is "Jimmy"
+}
+```
+
+- Gotchas with pointers - Reference vs Value Types
+
+In general Go is using __pass by value__ except for __reference types__ such as slice, since slice already has a pointer inside its structure. A slice pointer is copied as passed by value but __POINTS TO THE SAME  UNDERLYING ARRAY__.
+
+This is based on the fact that slice is a __composite__ data structure, a record of `ptr to head`, `length` & `capacity` & an __underlying array__ that `ptr to head` points to.
+
+__Reference__ types:
+
+- slices
+- maps
+- channels
+- pointers
+- functions (can be passed as arguments to functions)
+
+```Go
+func main() {
+  mySlice := []string{"Hi", "There"}
+
+  updateSlice(mySlice)
+
+  // Mutation works, no pass by value on slice
+  fmt.Println(mySlice)
+  // output [Bye There]
+
+  // This is valid code and dereference will undo what the reference operator does
+  fmt.Println(*&mySlice)
+}
+
+// Pass by value ? Yes, slice pointer is copied but PONTS TO THE SAME ARRAY.
+func updateSlice(s []string) {
+  s[0] = "Bye"
+}
+```
+
 ### GRPC MAsterclass
 
 - [https://www.udemy.com/course/grpc-golang](https://www.udemy.com/course/grpc-golang)
