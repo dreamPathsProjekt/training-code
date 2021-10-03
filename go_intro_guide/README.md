@@ -3,6 +3,8 @@
 ## Resources
 
 - [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout)
+- [https://golang.org/doc/faq](https://golang.org/doc/faq)
+- [https://golang.org/doc/effective_go](https://golang.org/doc/effective_go)
 
 ## VsCode settings for GVM
 
@@ -251,6 +253,47 @@ func updateSlice(s []string) {
   s[0] = "Bye"
 }
 ```
+
+#### Maps
+
+- Declarations
+
+```Go
+// Map of string keys with string values - literal
+colors := map[string]string{
+  "red": "#ff0000",
+  "green": "#4bf745",
+}
+
+// Variable declaration - zero initialization (empty map)
+var colors map[string]string
+
+// make equivalent (but different, see below) - zero initialization (empty map)
+colors := make(map[string]string)
+
+// value assignment
+colors["white"] = "#ffffff"
+// delete key value pair
+delete(colors, "white")
+```
+
+- `make` vs `new` (vs a variable declaration)
+  - make and new are built-in functions golang uses to allocate memory and allocate memory on the heap. make allocates and initializes memory.New just clears memory and does not initialize it.
+  - make returns the reference type itself; new returns a pointer to the type.
+  - make can only be used to allocate and initialize data of slice, map, channel type; new can allocate any type of data.
+  - [https://stackoverflow.com/questions/9320862/why-would-i-make-or-new](https://stackoverflow.com/questions/9320862/why-would-i-make-or-new)
+  - [https://stackoverflow.com/questions/25543520/declare-slice-or-make-slice](https://stackoverflow.com/questions/25543520/declare-slice-or-make-slice)
+  - Simple declaration `var s []int` __does not allocate memory and s points to nil__, while `s := make([]int, 0)` allocates memory and s points to memory to a slice with 0 elements. Usually, the first one is more idiomatic if you don't know the exact size of your use case.
+
+- `map` vs `struct`
+  - Struct keys don't support indexing (cannot iterate a struct), while map keys are __indexed__.
+  - Map is a __reference type__, struct is a __value type.__
+  - In struct you need to know all of the fields at compile time, map not needed (add and remove keys at runtime).
+  - Maps are used to represent a __collection of related properties__, structs are a thing with lot of different properties.
+
+#### Interfaces
+
+#### Channels & Go Routines
 
 ### GRPC MAsterclass
 
