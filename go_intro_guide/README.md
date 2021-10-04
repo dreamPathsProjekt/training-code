@@ -48,6 +48,8 @@
   - `internal/` is a special directory name recognised by the go tool which will prevent one package from being imported by another unless both share a common ancestor.
   - You can only declare a method with a __receiver whose type is defined in the same package as the method__. You cannot declare a method with a receiver whose type is defined in another package (which includes the built-in types such as int, func etc.). This is the reason why built-in types (primitives etc.) have to be __wrapped in a custom type__, to write receiver methods.
     - The reason is that if you could define methods on other packages' types, you could modify the behavior of other packages. This is because the method set of a given type can have an effect on how values of that type are used.
+- [https://medium.com/rungo/everything-you-need-to-know-about-packages-in-go-b8bac62b74cc](https://medium.com/rungo/everything-you-need-to-know-about-packages-in-go-b8bac62b74cc)
+- [https://medium.com/rungo/anatomy-of-modules-in-go-c8274d215c16](https://medium.com/rungo/anatomy-of-modules-in-go-c8274d215c16)
 
 #### Deeper: Variables/Functions/Slices/Types
 
@@ -298,6 +300,15 @@ delete(colors, "white")
 
 #### Interfaces
 
+- Interfaces are an example of __subtyping polymorphism__ [https://en.wikipedia.org/wiki/Polymorphism_(computer_science)](https://en.wikipedia.org/wiki/Polymorphism_(computer_science))
+  - __Ad-hoc polymorphism:__ function, method, operator overloading. No support from Go [https://golang.org/doc/faq#overloading](https://golang.org/doc/faq#overloading)
+    - Can support __variadic arguments__ in functions, of same type.
+  - __Parametric polymorphism:__ Generics (soon to be introduced in a future Go version)
+
+- Interface are also an example of __structural typing__ where behaviour of a type (methods) dictates whether the type can implement an interface. This is also called __implicit implementation.__
+  - __Nominal typing__ is an example where the implementation (equivalence) of an interface is based on __explicit static declaration__ of the sub-typing (e.g. by using `implements` keyword)
+    - In computer science, a type system is a nominal or nominative type system (or name-based type system) if compatibility and equivalence of data types is determined by explicit declarations and/or the name of the types. Nominal systems are used to determine if types are equivalent, as well as if a type is a subtype of another. Nominal type systems contrast with structural systems, where comparisons are based on the structure of the types in question and do not require explicit declarations. [https://en.wikipedia.org/wiki/Nominal_type_system](https://en.wikipedia.org/wiki/Nominal_type_system)
+
 - [Interfaces can also be implemented by non-struct types](https://golangbyexample.com/non-struct-type-implementing-interface-go/)
 - When a function receiver is not used, we can ommit the instance (just declare the type)
 
@@ -313,6 +324,73 @@ func (englishBot) getGreeting() {
 
 - Cannot have functions with __identical names__, unless they use __receivers__ of different type.
   - [https://medium.com/rungo/anatomy-of-methods-in-go-f552aaa8ac4a](https://medium.com/rungo/anatomy-of-methods-in-go-f552aaa8ac4a)
+
+- Cannot __create a value of non-concrete type__ - interface
+- To __implement__ an interface a type must implement all function signatures. Otherwise run-time error of `runtime error: invalid memory address or nil pointer dereference` is thrown.
+- Implementing only __part__ of an interface and __delegating the rest to an embedded interface__ of the same type is perfectly valid. However the concrete type, has to have the embedded type not nil.
+- Interfaces __are not generic types.__
+- Interfaces are __contract types.__ Treat them as important in the design process.
+- __Exported Interfaces__ from package can be implemented, from another package.
+
+- Interface composition example in the std library
+
+```Go
+// package net/http
+type Response struct {
+  Status     string // e.g. "200 OK"
+  StatusCode int    // e.g. 200
+  Proto      string // e.g. "HTTP/1.0"
+  ProtoMajor int    // e.g. 1
+  ProtoMinor int    // e.g. 0
+
+// ...
+
+// Struct field as interface type
+Body io.ReadCloser
+
+// ...
+}
+
+
+// package io
+// ReadCloser (type of http.Response.Body field) uses embedded interface types
+// To satisfy a "composite" interface, we need to satisfy the requirements of both interfaces.
+// It also means that a "composite" interface can be passed as argument types that require one of the embedded interfaces
+// Example: use io.ReadCloser in arguments typed with io.Reader or io.Closer.
+type ReadCloser interface {
+  Reader
+  Closer
+}
+
+type Reader interface {
+  Read(p []byte) (n int, err error)
+}
+
+type Writer interface {
+  Write(p []byte) (n int, err error)
+}
+
+type Closer interface {
+  Close() error
+}
+```
+
+- `io.Reader` interface uses input `[]byte` and __updates the input slice (usually empty) with data read__, and returns an integer, number of bytes read and `error`. Basically `.Read()` consumes an input from inside (a field) the caller struct and transforms it to `[]byte`
+- `Read()` function (at least in `net/http.Response` implementation) does not __grow__ the slice in size if needed, but reads until slice is full.
+
+```Go
+resp, _ := http.Get("https://google.com")
+
+// Allocate initialization space
+bs := make([]byte, 99999)
+
+// We do not care about number of bytes and ignore error.
+resp.Body.Read(bs)
+
+// bs []byte slice should be filled with incoming data from resp.Body
+// Casting to string is used to avoid output of a list of byte integers
+fmt.Println(string(bs))
+```
 
 #### Channels & Go Routines
 
