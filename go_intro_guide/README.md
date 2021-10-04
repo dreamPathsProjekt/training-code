@@ -5,6 +5,9 @@
 - [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout)
 - [https://golang.org/doc/faq](https://golang.org/doc/faq)
 - [https://golang.org/doc/effective_go](https://golang.org/doc/effective_go)
+- Google Wire for DI on complicated projects
+  - [https://github.com/google/wire/blob/main/_tutorial/README.md](https://github.com/google/wire/blob/main/_tutorial/README.md)
+  - [https://go.dev/blog/wire](https://go.dev/blog/wire)
 
 ## VsCode settings for GVM
 
@@ -43,6 +46,8 @@
   - `pkg` contains publicly exposed & reusable code (functions, structs)
   - `internal` contains privately used code [https://dave.cheney.net/2019/10/06/use-internal-packages-to-reduce-your-public-api-surface](https://dave.cheney.net/2019/10/06/use-internal-packages-to-reduce-your-public-api-surface)
   - `internal/` is a special directory name recognised by the go tool which will prevent one package from being imported by another unless both share a common ancestor.
+  - You can only declare a method with a __receiver whose type is defined in the same package as the method__. You cannot declare a method with a receiver whose type is defined in another package (which includes the built-in types such as int, func etc.). This is the reason why built-in types (primitives etc.) have to be __wrapped in a custom type__, to write receiver methods.
+    - The reason is that if you could define methods on other packages' types, you could modify the behavior of other packages. This is because the method set of a given type can have an effect on how values of that type are used.
 
 #### Deeper: Variables/Functions/Slices/Types
 
@@ -293,6 +298,22 @@ delete(colors, "white")
 
 #### Interfaces
 
+- [Interfaces can also be implemented by non-struct types](https://golangbyexample.com/non-struct-type-implementing-interface-go/)
+- When a function receiver is not used, we can ommit the instance (just declare the type)
+
+```Go
+type englishBot struct {}
+
+func (englishBot) getGreeting() {
+  // Receiver eb is not used, thus no need to be declared on receiver signature.
+  // Similar to static method. Useful for interface implementation, otherwise an anti-pattern.
+  return "Hi There!"
+}
+```
+
+- Cannot have functions with __identical names__, unless they use __receivers__ of different type.
+  - [https://medium.com/rungo/anatomy-of-methods-in-go-f552aaa8ac4a](https://medium.com/rungo/anatomy-of-methods-in-go-f552aaa8ac4a)
+
 #### Channels & Go Routines
 
 ### GRPC MAsterclass
@@ -302,6 +323,14 @@ delete(colors, "white")
 ### Go Serverless
 
 - [https://www.udemy.com/course/hands-on-serverless-computing-with-go](https://www.udemy.com/course/hands-on-serverless-computing-with-go)
+
+### Go Design Patterns
+
+- [https://www.udemy.com/course/design-patterns-go](https://www.udemy.com/course/design-patterns-go)
+
+### Go Rest Microservices
+
+- [https://www.udemy.com/course/rest-based-microservices-api-development-in-go-lang](https://www.udemy.com/course/rest-based-microservices-api-development-in-go-lang)
 
 ## Configuration & VSCode issues
 
