@@ -309,6 +309,7 @@ delete(colors, "white")
   - __Nominal typing__ is an example where the implementation (equivalence) of an interface is based on __explicit static declaration__ of the sub-typing (e.g. by using `implements` keyword)
     - In computer science, a type system is a nominal or nominative type system (or name-based type system) if compatibility and equivalence of data types is determined by explicit declarations and/or the name of the types. Nominal systems are used to determine if types are equivalent, as well as if a type is a subtype of another. Nominal type systems contrast with structural systems, where comparisons are based on the structure of the types in question and do not require explicit declarations. [https://en.wikipedia.org/wiki/Nominal_type_system](https://en.wikipedia.org/wiki/Nominal_type_system)
 
+- Interfaces cannot be used as __receivers__
 - [Interfaces can also be implemented by non-struct types](https://golangbyexample.com/non-struct-type-implementing-interface-go/)
 - When a function receiver is not used, we can ommit the instance (just declare the type)
 
@@ -390,6 +391,35 @@ resp.Body.Read(bs)
 // bs []byte slice should be filled with incoming data from resp.Body
 // Casting to string is used to avoid output of a list of byte integers
 fmt.Println(string(bs))
+```
+
+- `io.Writer` interface used with `io.Reader` to pipe input to output with less code. Example `io.Copy`:
+- `Writer()` function takes a `[]byte` slice as input and sends that data to a struct's output.
+
+```Go
+// Refactor above snippet
+resp, _ := http.Get("https://google.com")
+
+// os.Stdout implements the io.Writer interface (implements Write() method)
+// Notice how resp.Body which is of type io.ReadCloser can be used in place of an io.Reader argument in function Copy. This is the flexibility of choosing structural typing (implicit implementation)
+// io.ReadCloser has embedded interfaces io.Reader, io.Closer (superset) and can be substitute in-place of a plain io.Reader type.
+io.Copy(os.Stdout, resp.Body)
+
+// Signature of io.Copy
+func io.Copy(dst io.Writer, src io.Reader) (written int64, err error)
+```
+
+- __Go type assertions:__ Syntax to explore if a __struct instance satisfies an interface__ and thus if it has __methods__ needed (reflection). Usually in these cases the argument concrete type (struct instance) is uknown but satisfies some other interface, so it can be passed as argument.
+
+```Go
+// Instance: dst, test if satisfies interface: ReaderFrom
+// If ok is true then ReadFrom() must exist
+if instance, ok := dst.(ReaderFrom); ok {
+  return instance.ReadFrom(someValue)
+}
+
+// Type assertion
+obj, isOfType := variable.(type)
 ```
 
 #### Channels & Go Routines
