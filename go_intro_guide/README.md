@@ -1,5 +1,24 @@
 # Go Introductory Guide - Best Practices
 
+- [Go Introductory Guide - Best Practices](#go-introductory-guide---best-practices)
+  - [Resources](#resources)
+  - [VsCode settings for GVM](#vscode-settings-for-gvm)
+  - [Udemy Courses](#udemy-courses)
+    - [Go Complete](#go-complete)
+      - [Go main commands](#go-main-commands)
+      - [Packages Executable vs Reusable](#packages-executable-vs-reusable)
+      - [Deeper: Variables/Functions/Slices/Types](#deeper-variablesfunctionsslicestypes)
+      - [Structs & Pointers](#structs--pointers)
+      - [Maps](#maps)
+      - [Interfaces](#interfaces)
+      - [Channels & Go Routines](#channels--go-routines)
+    - [GRPC MAsterclass](#grpc-masterclass)
+    - [Go Serverless](#go-serverless)
+    - [Go Design Patterns](#go-design-patterns)
+    - [Go Rest Microservices](#go-rest-microservices)
+  - [Configuration & VSCode issues](#configuration--vscode-issues)
+  - [Interesting SO Questions](#interesting-so-questions)
+
 ## Resources
 
 - [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout)
@@ -8,6 +27,8 @@
 - Google Wire for DI on complicated projects
   - [https://github.com/google/wire/blob/main/_tutorial/README.md](https://github.com/google/wire/blob/main/_tutorial/README.md)
   - [https://go.dev/blog/wire](https://go.dev/blog/wire)
+- [https://betterprogramming.pub/7-code-patterns-in-go-i-cant-live-without-f46f72f58c4b](https://betterprogramming.pub/7-code-patterns-in-go-i-cant-live-without-f46f72f58c4b)
+- [https://talks.golang.org/2012/10things.slide#1](https://talks.golang.org/2012/10things.slide#1)
 
 ## VsCode settings for GVM
 
@@ -300,6 +321,8 @@ delete(colors, "white")
 
 #### Interfaces
 
+- [https://betterprogramming.pub/a-comprehensive-guide-to-interfaces-in-go-6a945b795db](https://betterprogramming.pub/a-comprehensive-guide-to-interfaces-in-go-6a945b795db)
+
 - Interfaces are an example of __subtyping polymorphism__ [https://en.wikipedia.org/wiki/Polymorphism_(computer_science)](https://en.wikipedia.org/wiki/Polymorphism_(computer_science))
   - __Ad-hoc polymorphism:__ function, method, operator overloading. No support from Go [https://golang.org/doc/faq#overloading](https://golang.org/doc/faq#overloading)
     - Can support __variadic arguments__ in functions, of same type.
@@ -423,6 +446,9 @@ obj, isOfType := variable.(type)
 ```
 
 #### Channels & Go Routines
+
+- A Go program consists of a __go routine__ running inside a process (the engine that executes code). So, go's `main()` is the single go routine that executes during program execution.
+- `go` keyword in front of function call means run the function inside a new __go routine__ (spawn a new go routine __thread__), instead of doing a __blocking call.__
 
 ### GRPC MAsterclass
 
