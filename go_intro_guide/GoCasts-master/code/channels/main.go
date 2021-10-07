@@ -21,6 +21,7 @@ func main() {
 		go checkLink(link, c)
 	}
 
+	// Status check every 5 seconds
 	for l := range c {
 		go func(link string) {
 			time.Sleep(5 * time.Second)

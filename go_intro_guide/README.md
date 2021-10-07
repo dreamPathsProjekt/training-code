@@ -447,8 +447,133 @@ obj, isOfType := variable.(type)
 
 #### Channels & Go Routines
 
+- [https://www.atatus.com/blog/goroutines-error-handling/](https://www.atatus.com/blog/goroutines-error-handling/)
 - A Go program consists of a __go routine__ running inside a process (the engine that executes code). So, go's `main()` is the single go routine that executes during program execution.
-- `go` keyword in front of function call means run the function inside a new __go routine__ (spawn a new go routine __thread__), instead of doing a __blocking call.__
+- `go` keyword in front of function call means run the function inside a new __go routine__ (spawn a new __child__ go routine __thread__), instead of waiting on a __blocking call.__
+- By default: Go scheduler __tries to use 1 CPU core__ by running go routines one at a time, unless they finish or get to a __blocking call__ (idle/waiting) - __Asynchronous/Concurrent execution.__
+- If we override the 1 CPU core setting with more, multiple go routines can be assigned on each core at the same time - __Parallel execution.__
+- There is execution priority that favours __main__ go routine, to __child__ go routines.
+  - __Gotcha:__ __main__ go routine finishesv(exits) before __child__ routines have finished. We have to make `main()` wait for results from child go routines.
+  - We achieve this using __channels.__ Channels is the only __data type__ we have to communicate between go routines, including __main.__
+- Buffered vs Unbuffered channels [https://medium.com/a-journey-with-go/go-buffered-and-unbuffered-channels-29a107c00268](https://medium.com/a-journey-with-go/go-buffered-and-unbuffered-channels-29a107c00268)
+  - If the capacity is zero or absent, the channel is __unbuffered__ and communication succeeds only when __both a sender and receiver are ready.__
+  - If the channel is __unbuffered__, the sender __blocks__ until the receiver has received the value. This is because effectively the channel has "no way" to __store messages inside__, for consumption.
+  - In the case of __buffered__ channel, the size of the __buffer__, means __how many messages__ it can store. Essentially, senders __do not block, until a receiver has received the value__, or until the __channel buffer is full.__
+  - __Under-sized buffers__ can impact performance, by incurring __latency,__ due to synchronization blocking, when the buffer is full.
+
+- Sending - receiving data with channels
+
+```Go
+// Send value 4 into a channel
+channel <- 4
+
+// Wait to receive value from channel. When a value is sent, assign the value to myNum.
+myNum <- channel
+
+// Wait to receive value from channel.  When a value is sent, immediately pass to function argument.
+fmt.Println(<-channel)
+```
+
+- Ways to block a channel - Channel gotchas
+
+```Go
+// Example of blocking unbuffered channel
+
+package main
+
+import (
+  "fmt"
+  "net/http"
+  "time"
+)
+
+func checkLink(link string, c chan string) {
+  // Blocking call
+  _, err := http.Get(link)
+  if err != nil {
+    fmt.Println(link, "might be down!")
+    c <- link
+    return
+  }
+
+  fmt.Println(link, "is up!")
+  c <- link
+}
+
+func main() {
+  links := []string{
+    "http://google.com",
+    "http://facebook.com",
+    "http://stackoverflow.com",
+    "http://golang.org",
+    "http://amazon.com",
+  }
+
+  // Allocate unbuffered channel
+  c := make(chan string)
+
+  for _, link := range links {
+    go checkLink(link, c)
+  }
+
+  // Gotcha: Receiver is outside a for loop.
+  // It will block (wait) until the first go routine finishes, and then will exit (it will print only 1 message)
+  fmt.Println(<-c)
+
+  // Gotcha: How to block a channel forever: Add more receivers (6) than senders (5)
+  for i := 0; i < len(links); i++ {
+    fmt.Println(<-c)
+  }
+  // This additional one will block, since there is no sender left.
+  fmt.Println(<-c)
+
+  // Proper loop: Receiver will have to wait for go routines to send in the channel, before print-outs.
+  // Not all will need to finish, to start the print outs. But for the for loop to complete, all go routines, will have to have finished.
+  // This for loop is essentially a repeated receiver, short of l <- c
+  for l := range c {
+    fmt.Println(l)
+  }
+
+  // Implement endless status checks without interval. First argument on checkLink is valid string (messages received from channel c)
+  for {
+    go checkLink(<-c, c)
+  }
+  // Alternative syntax - better idiomatic (explicit receive on channel)
+  for l := range c {
+    go checkLink(l, c)
+  }
+
+  // Implement endless status checks every 5 sec, using "endless" repeat receivers in anonymous function.
+  // Simply receivers never finish, since new go routines (senders) push messages in the channel.
+  // For loop never finishes.
+  for l := range c {
+    // Anonymous go routine (proper name: function literal). Immediately invoked function execution (IIFE)
+    // Wrap sleep inside a go routine, to avoid blocking the main go routine.
+    // While the main routine is paused, it cannot receive new messages. Messages are sent and queued.
+    go func(link string) {
+      // Sleep pauses the current go routine (anonymous)
+      time.Sleep(5 * time.Second)
+      checkLink(link, c)
+    }(l)
+  }
+
+  // What if we used l receivers directly as closure.
+  for l := range c {
+    go func() {
+      time.Sleep(5 * time.Second)
+      checkLink(l, c)
+    }()
+  }
+
+  // After the first run of the 5 links, the closure variable captures state of the last link visited.
+  // In essence we pass a variable value to a go routine, that currently is maintained by another goroutine!
+  // This means that repeated runs will check against the last captured url for 5 times, instead!
+  // This happens because all go routines reference the same enclosed variable, from the outer scope (for range loop).
+  // In order to resolve this, we pass the mutated l receiver as value (copies the value to each go routine inner scope).
+}
+```
+
+> Note: __NEVER share (or reference) the same__ variable between different go routines.
 
 ### GRPC MAsterclass
 
