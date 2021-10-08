@@ -13,6 +13,7 @@
       - [Interfaces](#interfaces)
       - [Channels & Go Routines](#channels--go-routines)
     - [GRPC MAsterclass](#grpc-masterclass)
+    - [Concurrency in GO](#concurrency-in-go)
     - [Go Serverless](#go-serverless)
     - [Go Design Patterns](#go-design-patterns)
       - [SOLID Principles](#solid-principles)
@@ -582,6 +583,10 @@ func main() {
 ### GRPC MAsterclass
 
 - [https://www.udemy.com/course/grpc-golang](https://www.udemy.com/course/grpc-golang)
+
+### Concurrency in GO
+
+- [https://www.udemy.com/course/up-n-running-with-concurrency-in-golang](https://www.udemy.com/course/up-n-running-with-concurrency-in-golang)
 
 ### Go Serverless
 
