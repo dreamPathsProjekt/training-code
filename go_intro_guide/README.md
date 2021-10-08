@@ -17,6 +17,7 @@
     - [Go Design Patterns](#go-design-patterns)
       - [SOLID Principles](#solid-principles)
       - [Builder Pattern](#builder-pattern)
+      - [Factory Pattern](#factory-pattern)
     - [Go Rest Microservices](#go-rest-microservices)
   - [Configuration & VSCode issues](#configuration--vscode-issues)
   - [Interesting SO Questions](#interesting-so-questions)
@@ -654,7 +655,7 @@ func (b *HtmlBuilder) AddChildFluent(
 
 - __Builder Facets (multiple builders for single object)__ pattern ends up in a small __DSL__
 - __Facets__ work by leveraging __embedding__ to switch from one builder to another, in a single __fluent interface__ [Builder Facets](./go-design-patterns/builder/creational.builder.builderfacets.go)
-- __Best-practice: Hide__ the actual object (struct) by making it private (lowercase) and export the builder externally (uppercase) [Parameter](./go-go-design-patterns/builder/creational.builder.builderparameter.go)
+- __Best-practice: Hide__ the actual object (struct) by making it private (lowercase) and export the builder externally (uppercase) [Parameter](./go-design-patterns/builder/creational.builder.builderparameter.go)
 - __Functional Builder__ [Functional Builder](./go-design-patterns/builder/creational.builder.functionalbuilder.go) __simplifies__ a lot of the code of builder methods, by keeping a list of build actions inside the builder.
 
 ```Go
@@ -698,6 +699,144 @@ func main() {
   fmt.Println(*p)
 }
 ```
+
+#### Factory Pattern
+
+- __Problem:__ Object creation becomes convoluted, we want to return different concrete objects that satisfy an interface, conditionally or business logic encapsulation on initializing of fields.
+- __Wholesale__ object creation - the inverse of __piecewise creation__ of Builder. Factory creates a whole full object, in one single invocation.
+  - __Factory function__ aka Constructor
+  - Separate struct - called __Factory__
+  - __Factory Generator__
+
+- Factory function that returns an __interface__ of concrete (hidden implementation) structs
+
+```Go
+// Hide concrete person as private
+type person struct {
+  name string
+  age int
+}
+
+type tiredPerson struct {
+  name string
+  age int
+}
+
+// Expose the interface
+type Person interface {
+  SayHello()
+}
+
+func (p *person) SayHello() {
+  fmt.Printf("Hi, my name is %s. I am %d years old.\n", p.name, p.age)
+}
+
+func (p *tiredPerson) SayHello() {
+  fmt.Println("Sorry I'm too tired.")
+}
+
+// Expose the factory function. Since we return an interface, there is no need for *Person type.
+// But we do return a pointer to the concrete object.
+func NewPerson(name string, age int) Person {
+  // Conditional logic that can return different concrete objects that satisfy the Person interface
+  if age > 100 {
+    return &tiredPerson{name, age}
+  }
+  return &person{name, age}
+}
+
+func main() {
+  // Encapsulate name, age as private variables
+  p := NewPerson("James", 34)
+  p.SayHello()
+
+  // This is illegal if used on another package
+  p.name := "John"
+}
+```
+
+- [__Factory Generator (Abstract Factory)__](./go-design-patterns/factory/creational.factories.factorygenerator.go)
+  - Functional approach - factories as functions - cannot mutate factory fields after creation (more Go idiomatic, also popular pattern in Javascript)
+  - Structural approach - factories as structs - can mutate factory fields after creation
+
+```Go
+// Functional Approach
+
+type Employee struct {
+  Name, Position string
+  AnnualIncome   int
+}
+
+// what if we want factories for specific roles?
+
+// functional approach - return a function for partial application - use only employee name as argument to the final factory.
+func NewEmployeeFactory(position string, annualIncome int) func(name string) *Employee {
+  return func(name string) *Employee {
+    return &Employee{name, position, annualIncome}
+  }
+}
+
+func main() {
+  developerFactory := NewEmployeeFactory("developer", 80000)
+  managerFactory := NewEmployeeFactory("manager", 100000)
+
+  developerNames := []string{"John", "James", "Tom"}
+  managerNames := []string{"Anna", "Lisa"}
+  developers := make([]string, 0)
+  managers := make([]string, 0)
+
+  // Make similar employee objects in bulk
+  for _, n := range developerNames {
+    developers = append(developers, developerFactory(n))
+  }
+
+  for _, n := range managerNames {
+    managers = append(managers, managerFactory(n))
+  }
+}
+```
+
+```Go
+// Structural Approach
+type Employee struct {
+  Name, Position string
+  AnnualIncome   int
+}
+
+type EmployeeFactory struct {
+  Position string
+  AnnualIncome int
+}
+
+func (f *EmployeeFactory) Create(name string) *Employee {
+  return &Employee{name, f,Position, f.AnnualIncome}
+}
+
+// structural approach - return an EmployeeFactory
+func NewEmployeeFactory(position string, annualIncome int) *EmployeeFactory {
+  return &EmployeeFactory{position, annualIncome}
+}
+
+func main() {
+  developerFactory := NewEmployeeFactory("developer", 80000)
+  managerFactory := NewEmployeeFactory("manager", 100000)
+
+  developerNames := []string{"John", "James", "Tom"}
+  managerNames := []string{"Anna", "Lisa"}
+  developers := make([]string, 0)
+  managers := make([]string, 0)
+
+  for _, n := range developerNames {
+    developers = append(developers, developerFactory.Create(n))
+  }
+
+  for _, n := range managerNames {
+    managers = append(managers, managerFactory.Create(n))
+  }
+}
+```
+
+- [__Prototype Factory__](./go-design-patterns/factory/creational.factories.protofactory.go) - Related also to __Prototype__ Design Pattern
 
 ### Go Rest Microservices
 

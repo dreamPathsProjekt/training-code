@@ -12,7 +12,7 @@ const (
 	Manager
 )
 
-// functional
+// Prototype functional
 func NewEmployee(role int) *Employee {
 	switch role {
 	case Developer:
