@@ -15,6 +15,7 @@
     - [GRPC MAsterclass](#grpc-masterclass)
     - [Go Serverless](#go-serverless)
     - [Go Design Patterns](#go-design-patterns)
+      - [SOLID Principles](#solid-principles)
     - [Go Rest Microservices](#go-rest-microservices)
   - [Configuration & VSCode issues](#configuration--vscode-issues)
   - [Interesting SO Questions](#interesting-so-questions)
@@ -29,6 +30,7 @@
   - [https://go.dev/blog/wire](https://go.dev/blog/wire)
 - [https://betterprogramming.pub/7-code-patterns-in-go-i-cant-live-without-f46f72f58c4b](https://betterprogramming.pub/7-code-patterns-in-go-i-cant-live-without-f46f72f58c4b)
 - [https://talks.golang.org/2012/10things.slide#1](https://talks.golang.org/2012/10things.slide#1)
+- [https://yourbasic.org/golang/iota/](https://yourbasic.org/golang/iota/)
 
 ## VsCode settings for GVM
 
@@ -586,6 +588,14 @@ func main() {
 ### Go Design Patterns
 
 - [https://www.udemy.com/course/design-patterns-go](https://www.udemy.com/course/design-patterns-go)
+
+#### SOLID Principles
+
+- Single Responsibility Principle (SRP)
+- Open-Closed Principle (OCP)
+- Liskov Substitution Principle (LSP)
+- Interface Segregation Principle (ISP)
+- Dependency Inversion Principle (DIP)
 
 ### Go Rest Microservices
 
