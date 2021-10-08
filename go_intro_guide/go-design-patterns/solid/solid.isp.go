@@ -1,7 +1,6 @@
 package main
 
 type Document struct {
-
 }
 
 type Machine interface {
@@ -63,7 +62,7 @@ func (m MyPrinter) Print(d Document) {
 }
 
 // combine interfaces
-type Photocopier struct {}
+type Photocopier struct{}
 
 func (p Photocopier) Scan(d Document) {
 	//

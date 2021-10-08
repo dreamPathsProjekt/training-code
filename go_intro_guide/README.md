@@ -16,6 +16,7 @@
     - [Go Serverless](#go-serverless)
     - [Go Design Patterns](#go-design-patterns)
       - [SOLID Principles](#solid-principles)
+      - [Builder Pattern](#builder-pattern)
     - [Go Rest Microservices](#go-rest-microservices)
   - [Configuration & VSCode issues](#configuration--vscode-issues)
   - [Interesting SO Questions](#interesting-so-questions)
@@ -596,6 +597,13 @@ func main() {
 - Liskov Substitution Principle (LSP)
 - Interface Segregation Principle (ISP)
 - Dependency Inversion Principle (DIP)
+
+#### Builder Pattern
+
+- Problem: Some Objects are simple and can be created in single constructor (or factory function) call
+- Other objects require a lot of __ceremony to create.__
+- Having a factory function with 10 arguments __is not productive, nor clean.__
+- __Builder:__ an API for constructing an object step-by-step.
 
 ### Go Rest Microservices
 
