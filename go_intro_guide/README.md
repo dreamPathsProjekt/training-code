@@ -604,6 +604,100 @@ func main() {
 - Other objects require a lot of __ceremony to create.__
 - Having a factory function with 10 arguments __is not productive, nor clean.__
 - __Builder:__ an API for constructing an object step-by-step.
+- Existing Builder pattern `strings.Builder` example:
+
+```Go
+import (
+  "fmt"
+  "strings"
+)
+
+func main() {
+  hello := "hello"
+  sb := strings.Builder{}
+  sb.WriteString("<p>")
+  sb.WriteString(hello)
+  sb.WriteString("</p>")
+  // Get concatenated (created) string
+  fmt.Printf("%s\n", sb.String())
+
+  // Alternative way to stringify a list of strings, other than join
+  words := []string{"hello", "world"}
+  sb.Reset()
+  // Create unordered html list from a string slice
+  // <ul><li>...</li><li>...</li><li>...</li></ul>'
+  sb.WriteString("<ul>")
+  for _, v := range words {
+    sb.WriteString("<li>")
+    sb.WriteString(v)
+    sb.WriteString("</li>")
+  }
+  sb.WriteString("</ul>")
+  fmt.Println(sb.String())
+}
+```
+
+- Go __fluent interface__ - method that returns the receiver, so the user can chain calls [Builder](./go-design-patterns/builder/creational.builder.builder.go)
+
+```Go
+func (b *HtmlBuilder) AddChildFluent(
+  childName, childText string) *HtmlBuilder {
+  e := HtmlElement{childName, childText, []HtmlElement{}}
+  b.root.elements = append(b.root.elements, e)
+  return b
+}
+
+// Use it as follows
+  b.AddChildFluent("li", "hello").AddChildFluent("li", "world")
+  fmt.Println(b.String())
+```
+
+- __Builder Facets (multiple builders for single object)__ pattern ends up in a small __DSL__
+- __Facets__ work by leveraging __embedding__ to switch from one builder to another, in a single __fluent interface__ [Builder Facets](./go-design-patterns/builder/creational.builder.builderfacets.go)
+- __Best-practice: Hide__ the actual object (struct) by making it private (lowercase) and export the builder externally (uppercase) [Parameter](./go-go-design-patterns/builder/creational.builder.builderparameter.go)
+- __Functional Builder__ [Functional Builder](./go-design-patterns/builder/creational.builder.functionalbuilder.go) __simplifies__ a lot of the code of builder methods, by keeping a list of build actions inside the builder.
+
+```Go
+type Person struct {
+  name, position string
+}
+
+type personMod func(*Person)
+type PersonBuilder struct {
+  actions []personMod
+}
+
+func (b *PersonBuilder) Called(name string) *PersonBuilder {
+  // Append a function literal to the actions slice
+  b.actions = append(b.actions, func(p *Person) {
+    p.name = name
+  })
+  return b
+}
+
+// Apply all functions to an empty Person object and return it
+func (b *PersonBuilder) Build() *Person {
+  p := Person{}
+  for _, a := range b.actions {
+    a(&p)
+  }
+  return &p
+}
+
+// Dynamic Extensibility - OCP
+func (b *PersonBuilder) WorksAsA(position string) *PersonBuilder {
+  b.actions = append(b.actions, func(p *Person) {
+    p.position = position
+  })
+  return b
+}
+
+func main() {
+  b := PersonBuilder{}
+  p := b.Called("Dmitri").WorksAsA("dev").Build()
+  fmt.Println(*p)
+}
+```
 
 ### Go Rest Microservices
 
