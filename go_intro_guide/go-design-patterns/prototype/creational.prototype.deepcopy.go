@@ -27,6 +27,7 @@ func main() {
 
 	// what you really want
 	jane := john
+	// Create a new Address pointer with the values of john
 	jane.Address = &Address{
 		john.Address.StreetAddress,
 		john.Address.City,

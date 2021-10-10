@@ -19,6 +19,7 @@
       - [SOLID Principles](#solid-principles)
       - [Builder Pattern](#builder-pattern)
       - [Factory Pattern](#factory-pattern)
+      - [Prototype](#prototype)
     - [Go Rest Microservices](#go-rest-microservices)
   - [Configuration & VSCode issues](#configuration--vscode-issues)
   - [Interesting SO Questions](#interesting-so-questions)
@@ -842,6 +843,27 @@ func main() {
 ```
 
 - [__Prototype Factory__](./go-design-patterns/factory/creational.factories.protofactory.go) - Related also to __Prototype__ Design Pattern
+
+#### Prototype
+
+- __Problem:__ Complicated objects aren't designed from scratch. They reiterate __existing designs.__
+- An existing design (partially or fully constructed) is a __Protorype__
+- We make a __copy (clone) of the prototype__ and customize it.
+  - Requires __deep copy__ support, which means copy all elements as values, not copy pointers.
+- We make the __cloning convenient__ (e.g. via a Factory)
+- Tom implement a prototype
+  - 1. __Partially construct__ an object and store it
+  - 2. Deep copy the __prototype__
+  - 3. __Customize__ the resulting instance
+  - 4. __A Prototype Factory__ provides a convenient API for using prototypes.
+
+- [__Deep Copy vs Shallow Copy Showcase__](go-design-patterns/prototype/creational.prototype.deepcopy.go) - manual method does not scale well when objects are complicated.
+- [__Copy Method__](go-design-patterns/prototype/creational.prototype.copymethod.go) - helper `copy` built-in for slices:
+  - The `copy` built-in function copies elements from a source slice into a destination slice. (As a special case, it also will copy bytes from a string to a slice of bytes.) The source and destination may overlap. Copy returns the number of elements copied, which will be the minimum of len(src) and len(dst).
+  - __Copy method__ does not solve the problem of types you do not own.
+- [__Copy through Serialization__](go-design-patterns/prototype/creational.prototype.serialization.go) - serialization to e.g. binary or json from/to struct is clever enough to achieve the deep copy outcomes (save/load all of its state).
+- [__Prototype Factory](go-design-patterns/prototype/creational.prototype.factory.go) - eliminate the code in initializing structs, by providing factory methods with __pre-filled prototypes.__
+  - Simply a prototype factory method, takes a prototype as argument, filled up with common fields values, deep copies it (creation of prototypes can be functions or structs), and implements the __customization__ by passing the arguments, to the customizable fields.
 
 ### Go Rest Microservices
 

@@ -2,6 +2,7 @@ package prototype
 
 import (
 	"bytes"
+	// Binary serialization
 	"encoding/gob"
 	"fmt"
 )
