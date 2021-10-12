@@ -302,4 +302,77 @@ async def main():
 asyncio.run(main())
 ```
 
-## Tasks, Futures & the Event Loop
+## Tasks, Futures & interacting with the Event Loop (low-level API)
+
+### Task Objects
+
+```Python
+# Tasks are the main way to run coroutines in the event loop
+
+async def main():
+    task = asyncio.create_task(stopwatch())
+    print(task)
+    # Task contains name: get_name, set_name methods, fields _coro: coroutine to run, _state (pending)
+    # <Task pending name='Task-2' coro=<stopwatch() running at /home/dreampaths/Documents/training-code/async_python/code/4_tasks_futures/main_4_2.py:4>>
+
+    # Reflect Task object - some task methods might be missing in versions: 3.7 < version < 3.8
+    print(dir(task))
+    ['__await__', '__class__', '__class_getitem__', '__del__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__iter__', '__le__', '__lt__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', '_asyncio_future_blocking', '_callbacks', '_cancel_message', '_coro', '_exception', '_fut_waiter', '_log_destroy_pending', '_log_traceback', '_loop', '_make_cancelled_error', '_must_cancel', '_repr_info', '_result', '_source_traceback', '_state', 'add_done_callback', 'cancel', 'cancelled', 'done', 'exception', 'get_coro', 'get_loop', 'get_name', 'get_stack', 'print_stack', 'remove_done_callback', 'result', 'set_exception', 'set_name', 'set_result']
+
+def callb(task):
+    # Callback should take task as only argument. Otherwise:
+    # TypeError: callb() takes 0 positional arguments but 1 was given
+    # Similar flow to a decorator
+    print('task is done', task)
+
+
+async def main():
+    task = asyncio.create_task(stopwatch())
+    # Callback to run on done.
+    task.add_done_callback(callb)
+    await task
+
+# 1
+# 2
+# 3
+# 4
+# task is done <Task finished name='Task-2' coro=<stopwatch() done, defined at /home/dreampaths/Documents/training-code/async_python/code/4_tasks_futures/main_4_2.py:4> result=None>
+# Task on done contains a result object, we can retrieve or set it.
+```
+
+### Interact with the Event Loop
+
+```Python
+# Event loop is only accessible inside the context of a coroutine
+# Throws Runtime Error - since no event loop running
+print(asyncio.get_running_loop())
+
+async def main():
+    print(asyncio.get_running_loop())
+    # <_UnixSelectorEventLoop running=True closed=False debug=False>
+    # As long as the code is running on single thread, this object is a singleton.
+    # Each OS thread is running its own event loop.
+    task = asyncio.create_task(stopwatch())
+    task.add_done_callback(callb)
+    await task
+
+asyncio.run(main())
+```
+
+### Futures
+
+```Python
+# A Task is subclass of Future - another awaitable object
+# A lot of the methods found on Task are also available on Future
+async def main():
+    task = asyncio.create_task(stopwatch())
+    task.add_done_callback(callb)
+    # Subclass of Future - returns True
+    print(asyncio.isfuture(task))
+    await task
+```
+
+[What is the difference between futures and tasks?](https://stackoverflow.com/questions/64851715/python-asyncio-future-vs-task)
+
+- In short, __future__ is the more general concept of a __container of an async result__, akin to a JavaScript __promise__.
+- Task is a subclass of future specialized for __executing coroutines__.
