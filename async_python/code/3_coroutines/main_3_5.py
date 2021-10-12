@@ -2,7 +2,7 @@ import asyncio
 
 
 class Stopwatch:
-    async def __await__(self):
+    def __await__(self):
         yield
 
 

@@ -214,4 +214,92 @@ async def main():
 
 ## Coroutines & Awaitables
 
+```Python
+# Module to help with object reflection
+import inspect
+
+# Calling an async function returns (coroutinefunction) a Coroutine (awaitable)
+async def main():
+    pass
+
+
+print(type(main))
+print(inspect.iscoroutinefunction(main))
+print(type(main()))
+print(dir(main()))
+
+<class 'function'>
+# Difference vs simple function using inspect.iscoroutinefunction(main)
+True
+# Return type
+<class 'coroutine'>
+# Reflection on coroutine, characteristic methods: close, cr_ family, send, throw
+# send is used to manually invoke the coroutine
+# throw is used to inject exceptions in coroutines
+['__await__', '__class__', '__del__', '__delattr__', '__dir__', '__doc__', '__eq__', '__format__', '__ge__', '__getattribute__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__name__', '__ne__', '__new__', '__qualname__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__str__', '__subclasshook__', 'close', 'cr_await', 'cr_code', 'cr_frame', 'cr_origin', 'cr_running', 'send', 'throw']
+```
+
+### Ways to run & cancel coroutines
+
+```Python
+# Ways to run coroutines
+# 1. using asyncio - usually to run main
+asyncio.run(main())
+# 2. await keyword
+await download()
+# 3. create_task
+asyncio.create_task(log())
+
+# Cancel coroutines (without cancel tasks)
+async def stopwatch():
+    count = 0
+    while True:
+        await asyncio.sleep(1)
+        count += 1
+        print(count)
+
+async def main():
+    # Manually start using send
+    coro = stopwatch()
+    coro.send(None)
+    await asyncio.sleep(2)
+    # Cancel with Exception injection using throw
+    coro.throw(asyncio.CancelledError)
+
+# The above methods should not be used by calls, but from other higher level functions/methods, such in the case of tasks and asyncio.run()
+async def main():
+    # Proper way to invoke
+    task = asyncio.create_task(stopwatch())
+    await asyncio.sleep(2)
+    # Proper way to cancel
+    task.cancel()
+
+# send & throw are low-level coroutine methods (not dunder but follow same philosophy)
+# They are used by high-level asyncio.create_task() & task.cancel()
+```
+
+### Types of Awaitable Objects
+
+The `await` expression only works with awaitables:
+
+- A `Coroutine`
+- A `Task`
+- A `Future`
+- A __custom awaitable__ by implementing the `__await__` method, that needs to return an __iterable.__
+
+```Python
+class Stopwatch():
+    # Note: __await__ is not async, just standard method
+    def __await__(self):
+        # Not very useful example (does nothing), but yield returns a generator (iterable)
+        yield
+
+
+async def main():
+    # Created a custome awaitable
+    await Stopwatch()
+
+asyncio.run(main())
+```
+
 ## Tasks, Futures & the Event Loop
