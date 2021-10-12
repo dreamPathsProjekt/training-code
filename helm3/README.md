@@ -13,6 +13,9 @@
 ## Helm3 Basics
 
 - Show `env` to distinguish from Helm 2 folders (`~/.helm` no longer used)
+- Older repos from Helm2 __still work__ with Helm3 - but no longer maintained (`DEPRECATED` flag)
+  - `stable` - `helm repo add stable https://charts.helm.sh/stable`
+  - `incubator` - `helm repo add incubator https://charts.helm.sh/incubator`
 
 ```Shell
 # $USER is dreampaths
@@ -51,7 +54,12 @@ helm3 create application-starter-1 --starter helm-starter-istio
 # You can also install and use the starter plugin
 helm plugin install https://github.com/salesforce/helm-starter.git
 helm starter fetch https://github.com/salesforce/helm-starter-istio.git
-helm3 create application-starter-1 --starter helm-starter-istio
+
+# See multiple starter charts
+ll ~/.local/share/helm/starters/helm-starter-istio/
+
+# Example choose mesh-service chart as starter - will also include Istio CRDs
+helm create istio-app-1 --starter helm-starter-istio/mesh-service
 ```
 
 > __Helm starters__ are used by the `helm create` command to customize the default chart. For example, an `Istio` starter can create `VirtualService` and `DestinationRule` objects, in addition to the standard `Service` and `Deployment` objects.
@@ -141,3 +149,110 @@ metadata:
 ## Packaging, Repositories & Chart Museum
 
 - [Chart Museum](https://chartmuseum.com/)
+- [https://github.com/helm/chartmuseum](https://github.com/helm/chartmuseum)
+- [ChartMuseum helm chart](https://github.com/chartmuseum/charts/tree/main/src/chartmuseum)
+
+### Install Chart Museum
+
+```Shell
+helm repo add chartmuseum https://chartmuseum.github.io/charts
+helm repo update
+
+helm search repo chartmuseum
+NAME                    CHART VERSION APP VERSION DESCRIPTION
+chartmuseum/chartmuseum 3.2.0         0.13.1      Host your own Helm Chart Repository
+
+kubectl create namespace chartmuseum
+# Install with default values, no persistence
+helm install chartmuseum chartmuseum/chartmuseum --namespace chartmuseum --version 3.2.0
+
+# Helm3 uninstall by default purges history, except when flag --keep-history is used.
+helm uninstall --debug -n chartmuseum chartmuseum
+# Debug to show resources deleted
+uninstall.go:95: [debug] uninstall: Deleting chartmuseum
+client.go:299: [debug] Starting delete for "chartmuseum" Service
+client.go:299: [debug] Starting delete for "chartmuseum" Deployment
+client.go:299: [debug] Starting delete for "chartmuseum" Secret
+uninstall.go:144: [debug] purge requested for chartmuseum
+release "chartmuseum" uninstalled
+```
+
+### Using Chart Museum to package and push helm charts
+
+```Shell
+# Port-forward pod & add local repository
+kubectl -n chartmuseum port-forward chartmuseum-595fcbdfbf-9bn6k 8080:8080 &
+helm repo add localrepo http://localhost:8080/
+helm repo list
+
+NAME        URL
+chartmuseum https://chartmuseum.github.io/charts
+localrepo   http://localhost:8080/
+
+# Package application-1 chart & push
+helm package application-1/
+Successfully packaged chart and saved it to: /home/dreampaths/Documents/training-code/helm3/application-1-0.1.0.tgz
+
+# Both methods need environment variable DISABLE_API=false in values.yaml of chartmuseum server.
+curl --data-binary "@application-1-0.1.0.tgz" http://localhost:8080/api/charts
+
+# Alternative, use cm-push plugin to publish chart without package command
+helm plugin install https://github.com/chartmuseum/helm-push.git
+helm plugin list
+
+helm cm-push application-1/ localrepo
+
+# Install from localrepo (generate release name)
+helm install localrepo/application-1 --generate-name
+```
+
+### Pull Repo locally for inspection
+
+```Shell
+helm repo add localstack-charts https://localstack.github.io/helm-charts
+helm repo update
+
+helm search repo localstack-charts
+NAME                          CHART VERSION APP VERSION DESCRIPTION
+localstack-charts/localstack  0.3.4         latest      A fully functional local AWS cloud stack
+
+# Pulls latest chart version to file localstack-0.3.4.tgz
+helm pull localstack-charts/localstack
+tar -xvzf localstack-0.3.4.tgz
+localstack/Chart.yaml
+localstack/Chart.lock
+localstack/values.yaml
+localstack/templates/NOTES.txt
+localstack/templates/_helpers.tpl
+localstack/templates/deployment.yaml
+localstack/templates/ingress.yaml
+localstack/templates/pvc.yaml
+localstack/templates/service.yaml
+localstack/templates/serviceaccount.yaml
+localstack/templates/tests/test-connection.yaml
+localstack/.helmignore
+localstack/README.md
+localstack/artifacthub-repo.yml
+localstack/charts/common/Chart.yaml
+localstack/charts/common/values.yaml
+localstack/charts/common/templates/_affinities.tpl
+localstack/charts/common/templates/_capabilities.tpl
+localstack/charts/common/templates/_errors.tpl
+localstack/charts/common/templates/_images.tpl
+localstack/charts/common/templates/_ingress.tpl
+localstack/charts/common/templates/_labels.tpl
+localstack/charts/common/templates/_names.tpl
+localstack/charts/common/templates/_secrets.tpl
+localstack/charts/common/templates/_storage.tpl
+localstack/charts/common/templates/_tplvalues.tpl
+localstack/charts/common/templates/_utils.tpl
+localstack/charts/common/templates/_warnings.tpl
+localstack/charts/common/templates/validations/_cassandra.tpl
+localstack/charts/common/templates/validations/_mariadb.tpl
+localstack/charts/common/templates/validations/_mongodb.tpl
+localstack/charts/common/templates/validations/_postgresql.tpl
+localstack/charts/common/templates/validations/_redis.tpl
+localstack/charts/common/templates/validations/_validations.tpl
+localstack/charts/common/.helmignore
+localstack/charts/common/README.md
+```
