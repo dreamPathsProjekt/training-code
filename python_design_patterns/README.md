@@ -8,3 +8,19 @@
 ## Factory pattern
 
 - [Factory](https://www.youtube.com/watch?v=s_4ZrtQs8Do)
+
+## Udemy Course
+
+- [https://www.udemy.com/course/design-patterns-python](https://www.udemy.com/course/design-patterns-python)
+
+### SOLID Principles
+
+#### SRP
+
+#### OCP
+
+#### LSP
+
+#### ISP
+
+#### DIP
