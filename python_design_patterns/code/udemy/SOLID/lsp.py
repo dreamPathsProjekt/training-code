@@ -27,17 +27,20 @@ class Rectangle:
         self._height = value
 
 
+# LSP, not need for a Square class in the first place, or use a Factory method.
 class Square(Rectangle):
     def __init__(self, size):
+        # Why not use super?
         Rectangle.__init__(self, size, size)
 
     @Rectangle.width.setter
     def width(self, value):
-        _width = _height = value
+        # Source of side-effect
+        self._width = self._height = value
 
     @Rectangle.height.setter
     def height(self, value):
-        _width = _height = value
+        self._width = self._height = value
 
 
 def use_it(rc):

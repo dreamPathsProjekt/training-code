@@ -1,11 +1,13 @@
 # Python design patterns
 
-## Python Dependency Inversion & Injection
+## YT Course
+
+### Python Dependency Inversion & Injection
 
 - [Original Video](https://www.youtube.com/watch?v=2ejbLVkCndI)
-- [Avoid coverage to try include abstract methods](./.coveragerc)
+- [Avoid coverage to try include abstract methods](code/youtube/.coveragerc)
 
-## Factory pattern
+### Factory pattern
 
 - [Factory](https://www.youtube.com/watch?v=s_4ZrtQs8Do)
 
@@ -15,12 +17,15 @@
 
 ### SOLID Principles
 
-#### SRP
+- Creational
+- Structural
+- Behavioral
 
-#### OCP
+Principles:
 
-#### LSP
-
-#### ISP
-
-#### DIP
+- SRP
+- OCP - Interesting implementation using `__and__` & duck-typing polymorphism: [ocp.py](code/udemy/SOLID/ocp.py)
+  - In Python we cannot overload the `and` operator, but by using protocols (implement `__and__` method) we can overload the binary `AND` operator `&` to accept non-binary objects.
+- LSP
+- ISP - Interesting implementation using `ABC` and __multiple inheritance__ of smaller, multiple interfaces [isp.py](code/udemy/SOLID/isp.py)
+- DIP

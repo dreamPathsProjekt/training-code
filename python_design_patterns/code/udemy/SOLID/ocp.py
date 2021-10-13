@@ -85,6 +85,7 @@ class AndSpecification(Specification):
         self.args = args
 
     def is_satisfied(self, item):
+        # Great use of duck typing polymorphism, the lambda reuses is_satisfied method for different specifications
         return all(map(
             lambda spec: spec.is_satisfied(item), self.args))
 

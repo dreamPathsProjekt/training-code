@@ -27,9 +27,13 @@ class Journal:
 
 
 class PersistenceManager:
-    def save_to_file(journal, filename):
+    def __init__(self, input):
+        self.input = input
+
+    # This can be achieved by single function, no need for class.
+    def save_to_file(self, filename):
         file = open(filename, "w")
-        file.write(str(journal))
+        file.write(str(self.input))
         file.close()
 
 
@@ -38,9 +42,9 @@ j.add_entry("I cried today.")
 j.add_entry("I ate a bug.")
 print(f"Journal entries:\n{j}\n")
 
-p = PersistenceManager()
+p = PersistenceManager(input=j)
 file = r'c:\temp\journal.txt'
-p.save_to_file(j, file)
+p.save_to_file(file)
 
 # verify!
 with open(file) as fh:
