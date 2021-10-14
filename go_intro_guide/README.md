@@ -23,6 +23,7 @@
     - [Go Rest Microservices](#go-rest-microservices)
   - [Configuration & VSCode issues](#configuration--vscode-issues)
   - [Interesting SO Questions](#interesting-so-questions)
+  - [Notes from `koslib`](#notes-from-koslib)
 
 ## Resources
 
@@ -902,4 +903,50 @@ func Bar(a,b,c int) {
 func main() {
     Bar(Args())
 }
+```
+
+## Notes from `koslib`
+
+- Avoid different variable names, opt for `err` (mutations isn't really a problem)
+- When __single__ binary - use repo name `cmd/reponame` package name, by convention
+- `config` antipattern - move to `cmd/<name>/init*.go` files with init functions (not auto `init()` func in `main.go`), that receive configuration details (e.g. from environment vars) & separate `config.go` with configuration constant, or variable __declarations only__. Example:
+
+```Shell
+# cmd high-level package
+cmd
+|__<repo-name> # produces binary <repo-name>
+  |__main.go
+  |__initEnv.go # import config to set variables, structs
+  |__initDB.go # import config to set variables, structs
+# config high-level package
+config
+|__config.go # var, const, struct declarations only of configuration values.
+```
+
+- Also, avoid using `init()` auto-init fuction in `main.go`, since it can have a lot of initialization __magic__ with unintended consequences. Prefer to use `init*` function calls, by functionality, sequentially, for stablitity reasons.
+- Avoid using `pkg` or `internal` on small/medium projects, packages in root folder per functionality & `cmd` package is a good practice. If package explosion is real then use some ideas from [https://github.com/golang-standards/project-layout](https://github.com/golang-standards/project-layout) although it's __not an official standard.__
+- __Good practice:__ Expose only interfaces, leave __implementations private__.
+- __Good practice:__ Structs with receivers can go to their own sub-package, based on functionality. Don't put all related structs on the same file.
+- __Opinionated good practice:__ Separate interfaces from concrete implementation, to different files, by utilizing sub-packages. Example:
+
+```Shell
+# High-level package name
+persistence
+|__repository.go # interface goes there
+|__postgresql # sub-package
+   |__repository.go # concrete implementation
+   |__connector.go # helpers of concrete implementation
+```
+
+- Package structure for web services:
+  - `api`: Contains routes (urls) only separated from their handlers (views/controllers) to different files. If api structure is complicated, split up between `api` and `handlers` packages.
+  - `service`: Contains business delegation logic, between api and persistence. Do the delegation and orchestraton there, do not include everything. Separate to different packages, per functionality.
+  - `models`: Data persistence models.
+  - Example:
+
+```Shell
+api # api high-level package
+|__handlers.go # handlers only
+|__routes.go # urls only
+|__middleware.go # do something intermediate with request/response processing, e.g. handle headers etc.
 ```

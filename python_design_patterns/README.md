@@ -17,9 +17,15 @@
 
 ### SOLID Principles
 
-- Creational
-- Structural
-- Behavioral
+Gamma Categorization:
+
+- Creational - Deal with creation of objects
+  - Explicit (constructor) or implicit (DI framework, reflection etc.)
+  - Wholesale (single statements) or piecewise (sevaral statements) creation
+- Structural - Concerned with the structures of classes, objects (e.g. class members)
+  - Many patterns are wrappers that mimic the underlying class' interface
+  - Stress the important of good API design with convenience in usability
+- Behavioral - all different, no central theme, solve particular problems
 
 Principles:
 
@@ -29,3 +35,11 @@ Principles:
 - LSP
 - ISP - Interesting implementation using `ABC` and __multiple inheritance__ of smaller, multiple interfaces [isp.py](code/udemy/SOLID/isp.py)
 - DIP
+
+### Builder
+
+- __Problem:__ Some objects require a lot of ceremony to create
+  - Having an object with 10 initializer arguments, not productive.
+  - __Piecewise Construction__ - Provide an API for object construction step by step.
+  - Most usually, usage of __fluent interfaces__ - object methods that return the object and can be chained together.
+
