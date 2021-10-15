@@ -48,3 +48,14 @@ Principles:
 
 ### Factory
 
+- __Problem:__ Object creation becomes convoluted.
+  - Initializer is not descriptive, always `__init__`
+  - Cannot overload with same sets of arguments with different names (you can use only __default keyword arguments__ to overload)
+  - The above can turn into __optional parameter hell__
+- __Wholesale__ object creation can be __outsourced__ to factories.
+  - A separate method usually static, or function (Factory Method) [code/udemy/factory/factory.py](code/udemy/factory/factory.py)
+  - Separate class or inner (Factory) [code/udemy/factory/factory.py](code/udemy/factory/factory.py)
+  - Hierarchy of factories - provide factories abstraction (improve DIP & OCP) (Abstract Factory) [code/udemy/factory/abstract_factory.py](code/udemy/factory/abstract_factory.py)
+    - `HotDrinkMachine` is an interesting implementation using homoiconicity to evaluate `eval()` the name of constructed classes.
+
+### Prototype
