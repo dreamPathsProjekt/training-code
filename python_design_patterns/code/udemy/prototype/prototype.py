@@ -22,6 +22,8 @@ class Person:
 
 john = Person("John", Address("123 London Road", "London", "UK"))
 print(john)
+# Shallow copy - just one level of copy, any object inside gets copied as a reference (similar to copying the pointer not the value)
+# jane = copy.copy
 # jane = john
 jane = copy.deepcopy(john)
 jane.name = "Jane"

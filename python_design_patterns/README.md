@@ -59,3 +59,11 @@ Principles:
     - `HotDrinkMachine` is an interesting implementation using homoiconicity to evaluate `eval()` the name of constructed classes.
 
 ### Prototype
+
+- __Problem:__ Complicated objects are designed not from scratch, but from existing products.
+  - They reiterate existing designs
+- An existing (partially or fully constructed) design is a __Prototype__
+- Make a copy (clone) of a prototype and customize it.
+  - Requires __deep copy__ support. `import copy; result = copy.deepcopy(proto)` [code/udemy/prototype/prototype.py](code/udemy/prototype/prototype.py)
+  - We make cloning convenient (e.g. via a Factory)
+- __Streamline__ the process of creation of multiple complex objects, with small customization differences.

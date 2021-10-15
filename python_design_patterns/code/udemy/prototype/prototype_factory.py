@@ -18,8 +18,9 @@ class Employee:
     def __str__(self):
         return f'{self.name} works at {self.address}'
 
-
+# can be refactored to functional pattern, with partial application
 class EmployeeFactory:
+    # Class members as protos
     main_office_employee = Employee("", Address("123 East Dr", 0, "London"))
     aux_office_employee = Employee("", Address("123B East Dr", 0, "London"))
 
