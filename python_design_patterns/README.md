@@ -42,4 +42,9 @@ Principles:
   - Having an object with 10 initializer arguments, not productive.
   - __Piecewise Construction__ - Provide an API for object construction step by step.
   - Most usually, usage of __fluent interfaces__ - object methods that return the object and can be chained together.
+- Builder pattern does not use abstraction, (rely on interfaces) and violates OCP, since the builder is tightly coupled with the implementation of objects it builds (low-level).
+- __Builder Facets__ uses a builder [__facade__](code/udemy/builder/builder_facets.py) with high-level methods that return lower-level category builders (aspects), to simplify construction in phases. It also helps to reduce the size of each method.
+- Generally to avoid __violation of OCP__ use inheritance with specialized __sub-builders.__ Interesting example of starting with specialization and move up to less specialized builder in one fluent interface pass [code/udemy/builder/builder_inheritance.py](code/udemy/builder/builder_inheritance.py)
+
+### Factory
 

@@ -22,6 +22,7 @@ class PersonBuilder:  # facade
         else:
             self.person = person
 
+    # Message passing with verb properties.
     @property
     def lives(self):
         return PersonAddressBuilder(self.person)
@@ -34,6 +35,7 @@ class PersonBuilder:  # facade
         return self.person
 
 
+# Inheritance is used to switch between builders and parent, in fluent interface.
 class PersonJobBuilder(PersonBuilder):
     def __init__(self, person):
         super().__init__(person)

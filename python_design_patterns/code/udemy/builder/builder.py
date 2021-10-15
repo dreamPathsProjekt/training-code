@@ -15,6 +15,7 @@ class HtmlElement:
             i1 = ' ' * ((indent + 1) * self.indent_size)
             lines.append(f'{i1}{self.text}')
 
+        # Recursive call to __str()
         for e in self.elements:
             lines.append(e.__str(indent + 1))
 
