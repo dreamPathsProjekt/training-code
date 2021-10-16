@@ -67,3 +67,7 @@ Principles:
   - Requires __deep copy__ support. `import copy; result = copy.deepcopy(proto)` [code/udemy/prototype/prototype.py](code/udemy/prototype/prototype.py)
   - We make cloning convenient (e.g. via a Factory)
 - __Streamline__ the process of creation of multiple complex objects, with small customization differences.
+
+### Singleton
+
+- __Problem:__ 
