@@ -1,7 +1,9 @@
+# Metaclass: class Name(type):
 class Singleton(type):
     """ Metaclass that creates a Singleton base type when called. """
     _instances = {}
 
+    # Override __call__ modifies the construction behaviour
     def __call__(cls, *args, **kwargs):
         if cls not in cls._instances:
             cls._instances[cls] = super(Singleton, cls)\

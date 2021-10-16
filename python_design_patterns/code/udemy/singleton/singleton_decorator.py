@@ -1,3 +1,4 @@
+# Class decorator to solve initializer issue
 def singleton(class_):
     instances = {}
 

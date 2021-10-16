@@ -9,8 +9,10 @@ class Database:
         # print('Loading database from file')
         pass
 
+    # Class variable
     _instance = None
 
+    # Allocator: __new__ method
     def __new__(cls, *args, **kwargs):
         if not cls._instance:
             cls._instance = super(Database, cls)\
@@ -24,6 +26,8 @@ database = Database()
 if __name__ == '__main__':
     d1 = Database()
     d2 = Database()
+
+    # In this case, this is the same ref, but initializers are both called
 
     print(d1.id, d2.id)
     print(d1 == d2)

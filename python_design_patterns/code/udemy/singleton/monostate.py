@@ -7,6 +7,8 @@ class CEO:
     }
 
     def __init__(self):
+        # The implementation of monostate
+        # Does not copy data, it copies the reference to a class (static) variable, which is shared.
         self.__dict__ = self.__shared_state
 
     def __str__(self):

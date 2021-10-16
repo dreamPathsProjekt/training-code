@@ -70,4 +70,27 @@ Principles:
 
 ### Singleton
 
-- __Problem:__ 
+- __Problem:__ For some components it make sense to have only one in the system.
+  - Example: database repository
+  - Object factory
+- When the initializer call is expensive (resource-wise)
+- We provide everyone with same instance, created only once.
+- Want to prevent additional copies
+- Need to take care of __lazy instantiation__ - instantiate only when needed.
+
+#### Additional notes
+
+- Required reading for examples: [Python "super object"](https://stackoverflow.com/questions/9056955/what-does-super-in-new/9092004)
+- Defining `__new__` always has an invisible/magic `@classmethod` decorator applied to it.
+- Defining `__call__` on metaclass has the same property as above.
+
+#### Monostate
+
+Python can also have the __monostate__ implementation of singleton: [code/udemy/singleton/monostate.py](code/udemy/singleton/monostate.py) - Not a very clean approach, it encourages heavy mutation.
+
+#### Testability problem of Singleton - breaks DIP & mock ability
+
+[code/udemy/singleton/singleton_testing.py](code/udemy/singleton/singleton_testing.py)
+
+- Notice how __DIP__ problem solution in Python is different to Go solution (interface)
+  - We leverage __duck-typing__ to avoid breaking __DIP__

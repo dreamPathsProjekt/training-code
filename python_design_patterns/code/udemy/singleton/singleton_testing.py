@@ -24,14 +24,17 @@ class SingletonRecordFinder:
     def total_population(self, cities):
         result = 0
         for c in cities:
+            # Tight coupling to singleton Database
             result += Database().population[c]
         return result
 
 
 class ConfigurableRecordFinder:
     def __init__(self, db):
+        # Dependency Injection
         self.db = db
 
+    # DIP without ABC: duck-typing
     def total_population(self, cities):
         result = 0
         for c in cities:
