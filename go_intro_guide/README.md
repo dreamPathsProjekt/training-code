@@ -20,6 +20,7 @@
       - [Builder Pattern](#builder-pattern)
       - [Factory Pattern](#factory-pattern)
       - [Prototype](#prototype)
+      - [Singleton](#singleton)
     - [Go Rest Microservices](#go-rest-microservices)
   - [Configuration & VSCode issues](#configuration--vscode-issues)
   - [Interesting SO Questions](#interesting-so-questions)
@@ -865,6 +866,22 @@ func main() {
 - [__Copy through Serialization__](go-design-patterns/prototype/creational.prototype.serialization.go) - serialization to e.g. binary or json from/to struct is clever enough to achieve the deep copy outcomes (save/load all of its state).
 - [__Prototype Factory](go-design-patterns/prototype/creational.prototype.factory.go) - eliminate the code in initializing structs, by providing factory methods with __pre-filled prototypes.__
   - Simply a prototype factory method, takes a prototype as argument, filled up with common fields values, deep copies it (creation of prototypes can be functions or structs), and implements the __customization__ by passing the arguments, to the customizable fields.
+
+#### Singleton
+
+- __Problem:__ For some components it makes sense to have only __one__ instance in the system.
+  - Example: Database repository
+  - Object factory
+  - E.g. the construction call is expensive (resource-wise)
+- We only create one instance
+- We give everyone the same instance
+- Prevet anyone creating additional copies - we create a private `struct` type and expose the `instance` publicly. Also use package `sync` with `sync.Once.Do()` struct (includes a `Mutex` field) & keep pointer to the one instance.
+- Need to take care of __lazy instantiation__, only create the instance, when it is needed.
+- [go-design-patterns/singleton/singleton.go](go-design-patterns/singleton/singleton.go)
+
+- Singleton is considered an anti-pattern or design smell - breaks __DIP__ principle.
+  - A usual side-effect of breaking __DIP__: __cannot create mocks__, will have to test on live data. Example: cannot assert number of results or values on live database, since data is always changing.
+  - __Solution:__ Introduce an interface, mock the singleton and functions can depend on interface (implemented only by singleton on live code, implemented by mock on test code)
 
 ### Go Rest Microservices
 
