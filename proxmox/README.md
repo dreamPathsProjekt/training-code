@@ -45,6 +45,8 @@ sudo mkfs.fat /dev/sdb5
 
 - [https://www.hostfav.com/blog/index.php/2017/02/01/add-a-new-physical-hard-drive-to-proxmox-ve-4x-5x/](https://www.hostfav.com/blog/index.php/2017/02/01/add-a-new-physical-hard-drive-to-proxmox-ve-4x-5x/)
 - [https://forum.proxmox.com/threads/how-to-create-an-lvm-thinpool-and-vz-directory-on-the-same-disk.62901/](https://forum.proxmox.com/threads/how-to-create-an-lvm-thinpool-and-vz-directory-on-the-same-disk.62901/)
+- [https://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/](https://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/)
+- [https://www.reddit.com/r/Proxmox/comments/7jw6m0/trying_to_add_a_lvm_new_hard_drive_but_not/](https://www.reddit.com/r/Proxmox/comments/7jw6m0/trying_to_add_a_lvm_new_hard_drive_but_not/)
 
 ```Shell
 # Carefully identify disk with lsblk
@@ -73,17 +75,51 @@ The partition table has been altered.
 Calling ioctl() to re-read partition table.
 Syncing disks.
 
-# Now new drive is ready. Using following commands we are going to create LVM Volume.
+# Can be better if parted is used.
+
+# Uknown: Create filesystem ext4 (better for resizing) or xfs (resize only up supported)
+mkfs.ext4 /dev/sdb1
+
+# Now new drive is ready. Using following commands we are going to create LVM Volumes.
 
 # Create Physical LVM volume
 pvcreate /dev/sdb1
 Physical volume "/dev/sdb1" successfully created.
 
-# Create Volume Group
-vgcreate newdrive /dev/sdb1
-Volume group "newdrive" successfully created
+# List physical volumes and display volume info
+pvs
+pvdisplay /dev/sdb1
 
-# Add storage either from dashboard or using pvesm add command.
-# LVM creation, LVM-Thinpool also needs the creation of thinpool
-pvesm add lvm local-lvm-secondary --vgname newdrive
+# Create Logical Volume Group
+vgcreate newdrivegroup /dev/sdb1
+Volume group "newdrivegroup" successfully created
+
+# List logical volume groups and display vg group info
+vgs
+vgdisplay newdrivegroup
+
+# Create Logical Volume, type LVM Thin. Name is newvol. Size is relative 100% available
+lvcreate newdrivegroup -n newvol --type thin-pool -l 100%FREE /dev/sdb1
+# Alternative
+lvcreate newdrivegroup -n newvol --thin/-T -l 100%FREE /dev/sdb1
+
+# List logical volumes and display volume info
+lvs
+lvdisplay newvol
+
+# Logical Volume rename example
+lvrename /dev/newdrivegroup/newvol /dev/newdrivegroup/data_secondary
+
+# Convert Volume from LVM to thinpool and other types.
+lvconvert --type thin-pool newvol
+
+# Scan PVE Storage for volumes
+pvesm scan lvmthin newvol
+
+# Add storage either from dashboard or using pvesm add command. For LVM use pvesm add lvm <name> --vgname <vgname>
+pvesm add lvmthin local-lvm-secondary --vgname newdrivegroup --thinpool newvol
 ```
+
+### Create new DIR Storage
+
+- [https://manjaro.site/how-to-add-extra-hard-drives-to-proxmox-6-2-ve/](https://manjaro.site/how-to-add-extra-hard-drives-to-proxmox-6-2-ve/)
