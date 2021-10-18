@@ -11,99 +11,79 @@
 - [https://www.geeksforgeeks.org/dd-command-linux/](https://www.geeksforgeeks.org/dd-command-linux/)
 - [Proxmox VE ISO Images](https://www.proxmox.com/en/downloads/category/iso-images-pve)
 
+Partitioning does not work for bootable UEFI drive, needs single partition with `dd` command.
+
 ```Shell
-# If needed create bootable partitions on USB
+# Optional slow: Wipe the whole USB disk & parition info. Might need to create 1 partition afterwards (?)
+sudo dd bs=1M if=/dev/zero of=/dev/sdb bs=1M status=progress
 
-# Be very careful to find USB media /dev/<name> label. In this example /dev/sdb is the removable media
-sudo parted -l
+# Copy the .iso image for Proxmox VE to /dev/sdb live USB, warning: copy to whole disk not partition.
+sudo dd bs=1M conv=fdatasync if=~/Downloads/iso/proxmox-ve_7.0-2.iso of=/dev/sdb status=progress
 
-Model:  USB  SanDisk 3.2Gen1 (scsi)
-Disk /dev/sdb: 30.8GB
-Sector size (logical/physical): 512B/512B
-Partition Table: gpt
-Disk Flags:
-
-# Start partition process for this drive
+# You can create more partitions for data to utilize USB disk space, and the live boot will be usable.
 sudo parted /dev/sdb
-# Create partition table (gpt)
-(parted) mklabel gpt
-Warning: The existing disk label on /dev/sdb will be destroyed and all data on this disk will be lost. Do you want to continue?
-Yes/No? yes
 
-# Show info
+# Show partition info
+sudo fdisk -l /dev/sdb
+
+# Create partition auto-mountable in Linux/Windows (fat32) - Start last Gap1 +1 kb, end: end of sector/Mb or 100%
+(parted) mkpart primary fat32 <start> 100%
+# Rename label for partition 5
+(parted) name 5
+# Name can be Data
+Partition name?  []? Data
+# Print partition info
 (parted) print
-Model:  USB  SanDisk 3.2Gen1 (scsi)
-Disk /dev/sdb: 30.8GB
-Sector size (logical/physical): 512B/512B
-Partition Table: gpt
-Disk Flags:
-
-Number  Start  End  Size  File system  Name  Flags
-
-# Get help on all options for mkpart
-(parted) help mkpart
-  mkpart PART-TYPE [FS-TYPE] START END     make a partition
-
-    PART-TYPE is one of: primary, logical, extended
-        FS-TYPE is one of: zfs, udf, btrfs, nilfs2, ext4, ext3, ext2, f2fs, fat32, fat16, hfsx, hfs+, hfs, jfs, swsusp, linux-swap(v1), linux-swap(v0), ntfs, reiserfs, freebsd-ufs, hp-ufs,
-        sun-ufs, xfs, apfs2, apfs1, asfs, amufs5, amufs4, amufs3, amufs2, amufs1, amufs0, amufs, affs7, affs6, affs5, affs4, affs3, affs2, affs1, affs0, linux-swap, linux-swap(new),
-        linux-swap(old)
-        START and END are disk locations, such as 4GB or 10%.  Negative values count from the end of the disk.  For example, -1s specifies exactly the last sector.
-
-        'mkpart' makes a partition without creating a new file system on the partition.  FS-TYPE may be specified to set an appropriate partition ID.
-
-# Create first partition bootable (primary) 4gb (start:0 end:4096MB). You can also ommit fstype
-(parted) mkpart primary xfs 0 4096MB
-Warning: The resulting partition is not properly aligned for best performance: 34s % 2048s != 0s
-Ignore/Cancel? I
-(parted) print
-Model:  USB  SanDisk 3.2Gen1 (scsi)
-Disk /dev/sdb: 30.8GB
-Sector size (logical/physical): 512B/512B
-Partition Table: gpt
-Disk Flags:
-
-Number  Start   End     Size    File system  Name     Flags
- 1      17.4kB  4096MB  4096MB  xfs          primary
-
-# Create second bootable partition (e.g. 2nd live usb distro in same usb drive)
-(parted) mkpart primary xfs 4096MB 8192MB
-Warning: The resulting partition is not properly aligned for best performance: 8000001s % 2048s != 0s
-Ignore/Cancel? I
-(parted) print
-Model:  USB  SanDisk 3.2Gen1 (scsi)
-Disk /dev/sdb: 30.8GB
-Sector size (logical/physical): 512B/512B
-Partition Table: gpt
-Disk Flags:
-
-Number  Start   End     Size    File system  Name     Flags
- 1      17.4kB  4096MB  4096MB  xfs          primary
- 2      4096MB  8192MB  4096MB  xfs          primary
-
-# Set boot flags on both
-(parted) set 1 boot on
-(parted) set 2 boot on
-(parted) print
-Model:  USB  SanDisk 3.2Gen1 (scsi)
-Disk /dev/sdb: 30.8GB
-Sector size (logical/physical): 512B/512B
-Partition Table: gpt
-Disk Flags:
-
-Number  Start   End     Size    File system  Name     Flags
- 1      17.4kB  4096MB  4096MB               primary  boot, esp
- 2      4096MB  8192MB  4096MB               primary  boot, esp
-
-# Quit and review partitioned disks with lsblk
 (parted) quit
-lsblk
+# Format the partition with mkfs.fat (fat32 by default)
+sudo mkfs.fat /dev/sdb5
+```
 
-# ...
-sdb             8:16   1  28.7G  0 disk
-├─sdb1          8:17   1   3.8G  0 part
-└─sdb2          8:18   1   3.8G  0 part
+## Storage
 
-# Copy the .iso image for Proxmox VE to /dev/sdb1 live USB
-sudo dd bs=1M conv=fdatasync if=~/Downloads/iso/proxmox-ve_7.0-2.iso of=/dev/sdb1
+### Create new LVM, LVM-Thin storage from secondary disk
+
+- [https://www.hostfav.com/blog/index.php/2017/02/01/add-a-new-physical-hard-drive-to-proxmox-ve-4x-5x/](https://www.hostfav.com/blog/index.php/2017/02/01/add-a-new-physical-hard-drive-to-proxmox-ve-4x-5x/)
+- [https://forum.proxmox.com/threads/how-to-create-an-lvm-thinpool-and-vz-directory-on-the-same-disk.62901/](https://forum.proxmox.com/threads/how-to-create-an-lvm-thinpool-and-vz-directory-on-the-same-disk.62901/)
+
+```Shell
+# Carefully identify disk with lsblk
+# Create partition on empty disk
+fdisk /dev/sdb
+
+# Create new partition type n and hit enter
+
+Command (m for help): n
+Partition type
+ p primary (0 primary, 0 extended, 4 free)
+ e extended (container for logical partitions)
+
+# Select partition type p for Primary and select default value for Partition Number, First Sector and Last Sector.
+
+Partition number (1-4, default 1):
+First sector (2048-16777215, default 2048):
+Last sector, +sectors or +size{K,M,G,T,P} (2048-16777215, default 16777215):
+
+Created a new partition 1 of type 'Linux' and of size 8 GiB.
+
+# Save partition – type w and hit enter.
+
+Command (m for help): w
+The partition table has been altered.
+Calling ioctl() to re-read partition table.
+Syncing disks.
+
+# Now new drive is ready. Using following commands we are going to create LVM Volume.
+
+# Create Physical LVM volume
+pvcreate /dev/sdb1
+Physical volume "/dev/sdb1" successfully created.
+
+# Create Volume Group
+vgcreate newdrive /dev/sdb1
+Volume group "newdrive" successfully created
+
+# Add storage either from dashboard or using pvesm add command.
+# LVM creation, LVM-Thinpool also needs the creation of thinpool
+pvesm add lvm local-lvm-secondary --vgname newdrive
 ```

@@ -475,6 +475,7 @@ obj, isOfType := variable.(type)
   - If the channel is __unbuffered__, the sender __blocks__ until the receiver has received the value. This is because effectively the channel has "no way" to __store messages inside__, for consumption.
   - In the case of __buffered__ channel, the size of the __buffer__, means __how many messages__ it can store. Essentially, senders __do not block, until a receiver has received the value__, or until the __channel buffer is full.__
   - __Under-sized buffers__ can impact performance, by incurring __latency,__ due to synchronization blocking, when the buffer is full.
+- [Buffered Channels Problems](https://nicksantos.medium.com/go-rant-buffered-channels-should-be-tossed-in-a-fire-d36dcc9dbf86)
 
 - Sending - receiving data with channels
 
