@@ -38,6 +38,13 @@
 - [https://talks.golang.org/2012/10things.slide#1](https://talks.golang.org/2012/10things.slide#1)
 - [https://yourbasic.org/golang/iota/](https://yourbasic.org/golang/iota/)
 
+Testing/Mocking pkgs
+
+- [Mockery](https://github.com/vektra/mockery)
+  - [https://medium.com/@thegalang/testing-in-go-mocking-mvc-using-testify-and-mockery-c25344a88691](https://medium.com/@thegalang/testing-in-go-mocking-mvc-using-testify-and-mockery-c25344a88691)
+- [Filesystem Mock](https://pkg.go.dev/testing/fstest)
+- [Abstract FS](https://github.com/spf13/afero)
+
 ## VsCode settings for GVM
 
 - Better isolation: project settings in `<project>/.vscode/settings.json`
