@@ -12,6 +12,7 @@
 - [Proxmox VE ISO Images](https://www.proxmox.com/en/downloads/category/iso-images-pve)
 - [https://www.reddit.com/r/linuxquestions/comments/hb5nlv/question_on_the_tool_wipefs_and_dd/](https://www.reddit.com/r/linuxquestions/comments/hb5nlv/question_on_the_tool_wipefs_and_dd/)
 - [https://superuser.com/questions/831486/complete-wiping-of-hard-drive-shred-wipe-or-dd](https://superuser.com/questions/831486/complete-wiping-of-hard-drive-shred-wipe-or-dd)
+- [https://medium.com/@liamcs98/functional-proxmox-homelab-framework-1bc7a68cc559](https://medium.com/@liamcs98/functional-proxmox-homelab-framework-1bc7a68cc559)
 
 Partitioning does not work for bootable UEFI drive, needs single partition with `dd` command.
 
