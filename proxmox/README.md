@@ -128,3 +128,8 @@ pvesm add lvmthin local-lvm-secondary --vgname newdrivegroup --thinpool newvol
 ### Create new DIR Storage
 
 - [https://manjaro.site/how-to-add-extra-hard-drives-to-proxmox-6-2-ve/](https://manjaro.site/how-to-add-extra-hard-drives-to-proxmox-6-2-ve/)
+
+## Cool Stuff
+
+- [Access the Web Dashboard without X-windows](https://linuxconfig.org/how-to-run-x-applications-without-a-desktop-or-a-wm)
+- [Lightweight Browsers to Install](https://linuxhint.com/top_lightweight_web_browsers_linux/)
