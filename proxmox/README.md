@@ -2,6 +2,7 @@
 
 - [Udemy Proxmox VE 6 Course](https://www.udemy.com/course/proxmox-ve-5)
 - [Udemy Proxmox VE HA with Corosync & CEPH](https://www.udemy.com/course/high-availability-cluster-with-proxmox-and-ceph)
+- [Hardware Info commands](https://medium.com/technology-hits/basic-linux-commands-to-check-hardware-and-system-information-62a4436d40db)
 
 ## Prepare installation media (USB)
 
