@@ -80,4 +80,20 @@ apt-get install -y ripgrep fd-find emacs
 git clone --depth 1 https://github.com/hlissner/doom-emacs ~/.emacs.d
 yes | ~/.emacs.d/bin/doom install
 yes | ~/.emacs.d/bin/doom sync
+
+# Install docker-ce-cli only
+sudo apt-get update
+sudo apt-get install  -y   apt-transport-https     ca-certificates     curl     gnupg     lsb-release
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/debian \
+   $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt-get update
+sudo apt-get -y install docker-ce-cli docker-compose
+docker version
+
+# Run docker commands as dockeruser, do this on entrypoint, dynamically find gid
+sudo groupadd -g 998 docker
+sudo adduser dockeruser docker
 ```
+
+- [Container-dind user run docker without sudo](https://stackoverflow.com/questions/47517128/how-do-i-give-a-non-root-user-access-to-docker-when-using-docker-dind)
