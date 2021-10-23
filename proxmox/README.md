@@ -216,6 +216,20 @@ vgs # single volume group
 
 - [https://manjaro.site/how-to-add-extra-hard-drives-to-proxmox-6-2-ve/](https://manjaro.site/how-to-add-extra-hard-drives-to-proxmox-6-2-ve/)
 
+## Additional tools to install on Proxmox hosts
+
+- `mc` Midnight commander
+- `parted` Partition manager - upgrade from `fdisk`
+- `bmon` Bandwidth monitor
+- `htop`
+- `ifupdown2` Interface management
+- `iftop` Interface monitor
+- `tmux`
+
+```Shell
+apt-get install -y ifupdown2 bmon iftop tmux mc htop parted
+```
+
 ## Cool Stuff
 
 - [Access the Web Dashboard without X-windows](https://linuxconfig.org/how-to-run-x-applications-without-a-desktop-or-a-wm)
