@@ -14,6 +14,7 @@
 - [https://www.reddit.com/r/linuxquestions/comments/hb5nlv/question_on_the_tool_wipefs_and_dd/](https://www.reddit.com/r/linuxquestions/comments/hb5nlv/question_on_the_tool_wipefs_and_dd/)
 - [https://superuser.com/questions/831486/complete-wiping-of-hard-drive-shred-wipe-or-dd](https://superuser.com/questions/831486/complete-wiping-of-hard-drive-shred-wipe-or-dd)
 - [https://medium.com/@liamcs98/functional-proxmox-homelab-framework-1bc7a68cc559](https://medium.com/@liamcs98/functional-proxmox-homelab-framework-1bc7a68cc559)
+- [https://gateway-it.com/turn-your-old-laptop-into-perfect-proxmox-server/](https://gateway-it.com/turn-your-old-laptop-into-perfect-proxmox-server/)
 
 Partitioning does not work for bootable UEFI drive, needs single partition with `dd` command.
 
@@ -53,6 +54,7 @@ sudo mkfs.fat /dev/sdb5
 - [https://forum.proxmox.com/threads/how-to-create-an-lvm-thinpool-and-vz-directory-on-the-same-disk.62901/](https://forum.proxmox.com/threads/how-to-create-an-lvm-thinpool-and-vz-directory-on-the-same-disk.62901/)
 - [https://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/](https://www.tecmint.com/manage-and-create-lvm-parition-using-vgcreate-lvcreate-and-lvextend/)
 - [https://www.reddit.com/r/Proxmox/comments/7jw6m0/trying_to_add_a_lvm_new_hard_drive_but_not/](https://www.reddit.com/r/Proxmox/comments/7jw6m0/trying_to_add_a_lvm_new_hard_drive_but_not/)
+- [https://www.cyberciti.biz/faq/howto-add-disk-to-lvm-volume-on-linux-to-increase-size-of-pool/](https://www.cyberciti.biz/faq/howto-add-disk-to-lvm-volume-on-linux-to-increase-size-of-pool/)
 
 ```Shell
 # Carefully identify disk with lsblk
@@ -126,6 +128,90 @@ pvesm scan lvmthin newvol
 pvesm add lvmthin local-lvm-secondary --vgname newdrivegroup --thinpool newvol
 ```
 
+### Extend LVM size with additional Hard Drive
+
+```Shell
+# List physical volumes and display volume info
+pvs
+# List logical volume groups and display vg group info
+vgs
+# List logical volumes and display volume info
+lvs
+
+# Create Physical LVM volume - new hard drive is /dev/sda
+pvcreate /dev/sda
+# Scan for usable LVM volumes
+pvs
+lvmdiskscan -l
+
+# Extend volume group: pve
+vgextend pve /dev/sda
+# Extend logical volume/thinpool /dev/pve/data
+lvextend /dev/pve/data /dev/sda
+
+# See extended config
+lsblk
+
+NAME                 MAJ:MIN RM   SIZE RO TYPE MOUNTPOINT
+sda                    8:0    0 931.5G  0 disk
+└─pve-data_tdata     253:3    0   1.2T  0 lvm
+  └─pve-data-tpool   253:4    0   1.2T  0 lvm
+    └─pve-data       253:5    0   1.2T  1 lvm
+sdb                    8:16   0 465.8G  0 disk
+├─sdb1                 8:17   0  1007K  0 part
+├─sdb2                 8:18   0   512M  0 part /boot/efi
+└─sdb3                 8:19   0 465.3G  0 part
+  ├─pve-swap         253:0    0     7G  0 lvm  [SWAP]
+  ├─pve-root         253:1    0    96G  0 lvm  /
+  ├─pve-data_tmeta   253:2    0   3.5G  0 lvm
+  │ └─pve-data-tpool 253:4    0   1.2T  0 lvm
+  │   └─pve-data     253:5    0   1.2T  1 lvm
+  └─pve-data_tdata   253:3    0   1.2T  0 lvm
+    └─pve-data-tpool 253:4    0   1.2T  0 lvm
+      └─pve-data     253:5    0   1.2T  1 lvm
+sr0                   11:0    1  1024M  0 rom
+
+lsblk -f
+
+NAME                 FSTYPE      FSVER    LABEL UUID                                   FSAVAIL FSUSE% MOUNTPOINT
+sda                  LVM2_member LVM2 001       nERO3j-yhSh-24Sc-lAKZ-5kku-MVJn-bqYkhN
+└─pve-data_tdata
+  └─pve-data-tpool
+    └─pve-data
+sdb
+├─sdb1
+├─sdb2               vfat        FAT32          42A7-FA0D                               510.7M     0% /boot/efi
+└─sdb3               LVM2_member LVM2 001       gCCc4U-SLc8-IINz-wZUs-sKqd-V718-KxsXDf
+  ├─pve-swap         swap        1              175d6aea-5106-41df-9799-0fef61682ab1                  [SWAP]
+  ├─pve-root         ext4        1.0            1aa9b353-b744-4e19-8d47-11e1ceb70cb6     85.8G     4% /
+  ├─pve-data_tmeta
+  │ └─pve-data-tpool
+  │   └─pve-data
+  └─pve-data_tdata
+    └─pve-data-tpool
+      └─pve-data
+sr0
+
+# Final listings
+pvs # 2 physical volumes
+
+  PV         VG  Fmt  Attr PSize    PFree
+  /dev/sda   pve lvm2 a--   931.51g      0
+  /dev/sdb3  pve lvm2 a--  <465.26g <16.00g
+
+lvs # same LVs (thinpool) as before with extended size
+
+  LV   VG  Attr       LSize  Pool Origin Data%  Meta%  Move Log Cpy%Sync Convert
+  data pve twi-aotz--  1.24t             0.00   0.60
+  root pve -wi-ao---- 96.00g
+  swap pve -wi-ao----  7.00g
+
+vgs # single volume group
+
+  VG  #PV #LV #SN Attr   VSize VFree
+  pve   2   3   0 wz--n- 1.36t <16.00g
+```
+
 ### Create new DIR Storage
 
 - [https://manjaro.site/how-to-add-extra-hard-drives-to-proxmox-6-2-ve/](https://manjaro.site/how-to-add-extra-hard-drives-to-proxmox-6-2-ve/)
@@ -134,3 +220,24 @@ pvesm add lvmthin local-lvm-secondary --vgname newdrivegroup --thinpool newvol
 
 - [Access the Web Dashboard without X-windows](https://linuxconfig.org/how-to-run-x-applications-without-a-desktop-or-a-wm)
 - [Lightweight Browsers to Install](https://linuxhint.com/top_lightweight_web_browsers_linux/)
+
+## Udemy Course: Proxmox VE 6
+
+### Networking
+
+### PVE Firewall
+
+- Firewall configuration is stored on proxmox `pmxcfs` - Proxmox Cluster FS
+  - Mounted on `/etc/pve` - `dev/fuse             128M   16K  128M   1% /etc/pve`
+- Rules `iptables` run on each cluster node - full isolation, better bandwidth management.
+- Full support for `IPV6` - no need to maintain different rules.
+- PVE Firewall Zones:
+  - __Host__ traffic from/to nodes
+  - __VM__ traffic from/to VM (LXC also)
+- PVE-Firewall `pve-firewall.service` service automatically updates rules `iptables` on changes.
+- Enable firewall
+  - GUI: Datacenter -> Firewall
+  - CLI: `/etc/pve/firewall/cluster.fw`
+- Firewall __enabled__: Traffic to all hosts is __blocked by default__
+  - Exceptions: WebGui(8006) & SSH(22) from __local network__
+  - On PVE 7 upgrade on `pve-kernel` is necessary with `apt-get dist-upgrade` for firewall to work correctly.
