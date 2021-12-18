@@ -2,7 +2,7 @@
 
 - [Go Introductory Guide - Best Practices](#go-introductory-guide---best-practices)
   - [Resources](#resources)
-  - [VsCode settings for GVM](#vscode-settings-for-gvm)
+  - [VsCode settings for GVM - Go Completion](#vscode-settings-for-gvm---go-completion)
   - [Udemy Courses](#udemy-courses)
     - [Go Complete](#go-complete)
       - [Go main commands](#go-main-commands)
@@ -45,7 +45,7 @@ Testing/Mocking pkgs
 - [Filesystem Mock](https://pkg.go.dev/testing/fstest)
 - [Abstract FS](https://github.com/spf13/afero)
 
-## VsCode settings for GVM
+## VsCode settings for GVM - Go Completion
 
 - Better isolation: project settings in `<project>/.vscode/settings.json`
 
@@ -54,6 +54,13 @@ Testing/Mocking pkgs
     "go.gopath": "/home/dreampaths/.gvm/pkgsets/go1.16.8/global",
     "go.goroot": "/home/dreampaths/.gvm/gos/go1.16.8",
 }
+```
+
+- Install GO bash completion
+
+```Bash
+sudo wget https://raw.github.com/kura/go-bash-completion/master/etc/bash_completion.d/go -O /etc/bash_completion.d/go
+. ~/.bashrc
 ```
 
 ## Udemy Courses
