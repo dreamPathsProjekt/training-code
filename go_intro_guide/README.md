@@ -37,6 +37,7 @@
 - [https://betterprogramming.pub/7-code-patterns-in-go-i-cant-live-without-f46f72f58c4b](https://betterprogramming.pub/7-code-patterns-in-go-i-cant-live-without-f46f72f58c4b)
 - [https://talks.golang.org/2012/10things.slide#1](https://talks.golang.org/2012/10things.slide#1)
 - [https://yourbasic.org/golang/iota/](https://yourbasic.org/golang/iota/)
+- [Go multi-module repositories](https://github.com/golang/go/wiki/Modules#faqs--multi-module-repositories)
 
 Testing/Mocking pkgs
 
