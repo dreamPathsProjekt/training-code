@@ -13,7 +13,7 @@ git checkout start
 
 ```Shell
 # Go modules
-go mod init github.com/dreamPathsProjekt/training-code/kubernetes_operators_controllers/kubecon-workshop-intro
+go mod init github.com/dreamPathsProjekt/training-code/kubebuilder-workshops
 go get sigs.k8s.io/controller-tools/cmd/controller-gen sigs.k8s.io/controller-runtime
 go mod download
 

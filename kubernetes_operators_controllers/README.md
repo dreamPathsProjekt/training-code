@@ -8,6 +8,7 @@
 - [Tutorial Video: Deep Dive into the Operator Framework](https://www.youtube.com/watch?v=8_DaCcRMp5I)
 - [CNCF: Writing an Operator: The Hard Parts](https://www.youtube.com/watch?v=wMqzAOp15wo)
 - [Kubebuilder Workshops](https://github.com/directxman12/kubebuilder-workshops)
+- [Controllers & Reconciliation](https://cluster-api.sigs.k8s.io/developer/providers/implementers-guide/controllers_and_reconciliation.html)
 
 ## Building Blocks
 
