@@ -38,6 +38,7 @@
 - [https://talks.golang.org/2012/10things.slide#1](https://talks.golang.org/2012/10things.slide#1)
 - [https://yourbasic.org/golang/iota/](https://yourbasic.org/golang/iota/)
 - [Go multi-module repositories](https://github.com/golang/go/wiki/Modules#faqs--multi-module-repositories)
+- [Go Concurrency Guide](https://github.com/luk4z7/go-concurrency-guide)
 
 Testing/Mocking pkgs
 
