@@ -33,7 +33,7 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
     - [OpenVPN3 - Terminal](#openvpn3---terminal)
       - [OpenVPN3 Installation](#openvpn3-installation)
       - [OpenVPN3 Usage](#openvpn3-usage)
-    - [Screenrecorder](#screenrecorder)
+    - [Screenrecorder - Pass](#screenrecorder---pass)
   - [Install Development Tools](#install-development-tools)
     - [Common](#common)
   - [Developer Tweaks](#developer-tweaks)
@@ -46,6 +46,7 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
       - [Bash Git Prompt](#bash-git-prompt)
       - [Vim Colorschemes](#vim-colorschemes)
       - [K8s Prompt](#k8s-prompt)
+      - [Jetbrains Toolbox](#jetbrains-toolbox)
 
 ## Change Passwords
 
@@ -630,12 +631,18 @@ openvpn3 session-manage --disconnect --config example-udp
 openvpn3 session-manage --path /net/openvpn/v3/sessions/f911ff8es6482s4ed6sb6bbs0fb28c91fa04 --disconnect
 ```
 
-### Screenrecorder
+### Screenrecorder - Pass
 
-To record videos of your screen you can use _simplescreenrecorder_:
+- To record videos of your screen you can use _simplescreenrecorder_:
 
 ```bash
 sudo apt install simplescreenrecorder
+```
+
+- For the GNU password manager install _pass_:
+
+```bash
+sudo apt install pass
 ```
 
 ## Install Development Tools
@@ -734,3 +741,10 @@ ll ~/.config/terminator/
 #### K8s Prompt
 
 - [Kube PS1](https://github.com/jonmosco/kube-ps1)
+
+#### Jetbrains Toolbox
+
+```bash
+# Inside ~/.bash_aliases
+alias jetbrains="~/.local/share/JetBrains/Toolbox/bin/jetbrains-toolbox"
+```
