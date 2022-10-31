@@ -3,6 +3,38 @@
 Useful onboarding instructions and how-to guides for "job-hopping" Linux workstations.
 This guide is meant to be followed top to bottom, skipping the parts you may not need.
 
+- [The Job Hopper](#the-job-hopper)
+  - [Change Passwords](#change-passwords)
+    - [Disk Encryption](#disk-encryption)
+    - [User Password](#user-password)
+  - [Backup and Adjust Partition Size](#backup-and-adjust-partition-size)
+    - [Create, Boot Kubuntu Live Image](#create-boot-kubuntu-live-image)
+    - [Backup](#backup)
+    - [Repartition](#repartition)
+  - [Basic System Tweaks](#basic-system-tweaks)
+    - [Improve Battery Life](#improve-battery-life)
+    - [Sleep Issues](#sleep-issues)
+    - [Enable Hibernation](#enable-hibernation)
+    - [Random Freezes](#random-freezes)
+    - [Install System Tools](#install-system-tools)
+  - [Other System Tweaks - Optional](#other-system-tweaks---optional)
+    - [Install default KDE](#install-default-kde)
+    - [Install Kubuntu Latest KDE](#install-kubuntu-latest-kde)
+    - [Firmware Update](#firmware-update)
+    - [Yubikey Authentication](#yubikey-authentication)
+    - [AptX (Bluetooth HQ Audio)](#aptx-bluetooth-hq-audio)
+    - [Mount /tmp on tmpfs](#mount-tmp-on-tmpfs)
+  - [Install Productivity Tools](#install-productivity-tools)
+    - [Chrome](#chrome)
+    - [Slack](#slack)
+      - [Via Deb Package](#via-deb-package)
+      - [Via Snap Package](#via-snap-package)
+    - [OpenVPN](#openvpn)
+    - [OpenVPN3 - Terminal](#openvpn3---terminal)
+      - [OpenVPN3 Installation](#openvpn3-installation)
+      - [OpenVPN3 Usage](#openvpn3-usage)
+    - [Screenrecorder](#screenrecorder)
+
 ## Change Passwords
 
 ### Disk Encryption
@@ -435,4 +467,151 @@ supported.
 sudo systemctl enable /usr/share/systemd/tmp.mount
 Created symlink /etc/systemd/system/local-fs.target.wants/tmp.mount → /usr/share/systemd/tmp.mount.
 Created symlink /etc/systemd/system/tmp.mount → /usr/share/systemd/tmp.mount.
+```
+
+## Install Productivity Tools
+
+### Chrome
+
+> Remember to separate your work profile from your personal profile. Store
+work-related passwords only to the work profile.
+
+To install Chrome via Google's repositories:
+
+```bash
+curl -sL https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
+sudo apt update
+sudo apt install google-chrome-stable
+```
+
+### Slack
+
+Like Zoom you can install Slack manually via deb, or via snap. Via deb it is
+more performant. Also it installs automatically its repository so you get
+updates via apt, thus there is no reason to choose snap.
+
+#### Via Deb Package
+
+Download [Slack Deb package from Slack's
+website](https://slack.com/intl/en-gr/downloads/linux) and install:
+
+```bash
+sudo apt install ~/Downloads/slack-desktop-4.19.2-amd64.deb
+```
+
+You will have to do the same every time you want to update.
+
+#### Via Snap Package
+
+```bash
+sudo snap install --classic slack
+```
+
+### OpenVPN
+
+To install OpenVPN:
+
+```bash
+sudo apt install network-manager-openvpn network-manager-openvpn-gnome openvpn openvpn-systemd-resolved
+```
+
+Once installed you can add a new OpenVPN connection to NetworkManager.
+
+Open NetworkManager, press the _Add new connection_ button,
+then select _Other → Import VPN connection..._ and add the `ovpn` file that was
+provided to you.
+
+### OpenVPN3 - Terminal
+
+In any case if the VPN config does not work correctly with NetworkManager, install `openvpn3`
+The terminal-based `openvpn3` is an easy to use network manager for VPN configurations,
+that does not need `sudo` execution permissions and can save configurations.
+
+#### OpenVPN3 Installation
+
+To install OpenVPN3:
+
+```Shell
+# Add, install and fix the openvpn3 repos
+sudo apt install apt-transport-https
+sudo wget https://swupdate.openvpn.net/repos/openvpn-repo-pkg-key.pub
+sudo apt-key add openvpn-repo-pkg-key.pub
+
+sudo wget -O /etc/apt/sources.list.d/openvpn3.list "https://swupdate.openvpn.net/community/openvpn3/repos/openvpn3-$(lsb_release -cs).list"
+
+# Fix the openvpn3 repo to correctly retrieve amd64 arch versions
+sudo vim /etc/apt/sources.list.d/openvpn3.list
+
+# Replace line:
+deb https://swupdate.openvpn.net/community/openvpn3/repos focal main
+# With Line:
+deb [arch=amd64] https://swupdate.openvpn.net/community/openvpn3/repos focal main
+
+# Update & install
+sudo apt update
+sudo apt install openvpn3
+```
+
+#### OpenVPN3 Usage
+
+Import tcp and udp config files for VPN. In this example the configuration files are extracted in folder: `~/.local/share/openvpn-configs`
+
+```Shell
+# Import the 2 config files with names
+openvpn3 config-import --persistent --name example-udp --config ~/.local/share/openvpn-configs/openvpn-udp.conf
+openvpn3 config-import --persistent --name example --config ~/.local/share/openvpn-configs/openvpn.conf
+
+# List configs to show their canonical folders
+Configuration path
+Imported                        Last used                 Used
+Name                                                      Owner
+------------------------------------------------------------------------------
+/net/openvpn/v3/configuration/7fcc32d9xb405x4f78xa72axcbe6a87dc532
+Sat Oct 30 20:59:03 2021        Sat Oct 30 21:02:51 2021  2
+example-udp                                                <your-user>
+
+/net/openvpn/v3/configuration/ae3636c1xbdc4x45abxbd5fx241fd7814762
+Sat Oct 30 21:04:50 2021                                  0
+example                                                    <your-user>
+------------------------------------------------------------------------------
+```
+
+Start a session in the background, e.g. the udp one
+
+```Shell
+# Start with named configuration
+openvpn3 session-start --config example-udp
+
+# Or, Start with config-path
+openvpn3 session-start --config-path /net/openvpn/v3/configuration/7fcc32d9xb405x4f78xa72axcbe6a87dc532
+
+# List running sessions
+openvpn3 sessions-list
+-----------------------------------------------------------------------------
+        Path: /net/openvpn/v3/sessions/f911ff8es6482s4ed6sb6bbs0fb28c91fa04
+     Created: Sat Oct 30 21:02:51 2021                  PID: 59210
+       Owner: <your-user>                             Device: tun0
+ Config name: /home/<your-user>/.local/share/openvpn-configs/openvpn-udp.conf  (Current name: example-udp)
+Session name: boxes.yourdomain.com
+      Status: Connection, Client connected
+-----------------------------------------------------------------------------
+```
+
+Close running session when finished
+
+```Shell
+# Disconnect with named configuration
+openvpn3 session-manage --disconnect --config example-udp
+
+# Disconnect with session-path
+openvpn3 session-manage --path /net/openvpn/v3/sessions/f911ff8es6482s4ed6sb6bbs0fb28c91fa04 --disconnect
+```
+
+### Screenrecorder
+
+To record videos of your screen you can use _simplescreenrecorder_:
+
+```bash
+sudo apt install simplescreenrecorder
 ```
