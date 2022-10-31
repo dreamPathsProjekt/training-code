@@ -34,6 +34,18 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
       - [OpenVPN3 Installation](#openvpn3-installation)
       - [OpenVPN3 Usage](#openvpn3-usage)
     - [Screenrecorder](#screenrecorder)
+  - [Install Development Tools](#install-development-tools)
+    - [Common](#common)
+  - [Developer Tweaks](#developer-tweaks)
+    - [Bash completion](#bash-completion)
+    - [GPG Agent](#gpg-agent)
+    - [SSH Agent](#ssh-agent)
+    - [Verify Jenkinsfiles](#verify-jenkinsfiles)
+    - [Terminal and Editor customization](#terminal-and-editor-customization)
+      - [Terminator Themes](#terminator-themes)
+      - [Bash Git Prompt](#bash-git-prompt)
+      - [Vim Colorschemes](#vim-colorschemes)
+      - [K8s Prompt](#k8s-prompt)
 
 ## Change Passwords
 
@@ -68,6 +80,8 @@ The laptop comes with almost the whole disk formatted as a single partition and
 a tiny swap partition. Some people might need a larger swap partition in order
 to __enable hibernation__, or want to have some unallocated space available they can
 later use as they see fit.
+
+[Check Swap Size](https://www.cyberciti.biz/faq/linux-check-swap-usage-command/)
 
 ### Create, Boot Kubuntu Live Image
 
@@ -111,7 +125,8 @@ image using all cores.
 mount /dev/sdY /mnt
 apt update
 apt install pigz pv
-pv -pterab /dev/nvme0n1 | pigz --processes 6 --stdout > /mnt/laptop-backup.img
+# On some systems boot partition is on nvme0n1p1 and root on nvme0n1p3
+pv -pterab /dev/nvme0n1p3 | pigz --processes 6 --stdout > /mnt/laptop-backup.img
 sync # This can take quite long if you used a flash drive for the backup
 umount /mnt
 ```
@@ -474,15 +489,22 @@ Created symlink /etc/systemd/system/tmp.mount → /usr/share/systemd/tmp.mount.
 ### Chrome
 
 > Remember to separate your work profile from your personal profile. Store
-work-related passwords only to the work profile.
+work-related passwords only to the work profile. Also remember to import bookmarks from your profile/(s).
 
 To install Chrome via Google's repositories:
 
 ```bash
-curl -sL https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+curl -L https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 echo "deb [arch=amd64] http://dl.google.com/linux/chrome/deb/ stable main" | sudo tee /etc/apt/sources.list.d/google-chrome.list
 sudo apt update
 sudo apt install google-chrome-stable
+```
+
+If Chrome comes pre-installed, fix your repo signing key with:
+
+```bash
+curl -L https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
+sudo apt update
 ```
 
 ### Slack
@@ -615,3 +637,100 @@ To record videos of your screen you can use _simplescreenrecorder_:
 ```bash
 sudo apt install simplescreenrecorder
 ```
+
+## Install Development Tools
+
+### Common
+
+These command line utilities can be used to improve your workflows or help you
+debug:
+
+```bash
+sudo apt install curl mosh silversearcher-ag
+```
+
+- curl: the well known tool to perform requests to web servers
+- mosh: the mobile shell can be used for persistent ssh sessions
+- silversearcher-ag: better than grep for searching source code
+
+Can be found on asdf:
+
+- tmux: shell session manager, better than screen
+- shellcheck: shell script analysis tool, required by the SRE chapter
+- jq: manipulate JSON in the command line, useful for scripting and working with JSON APIs
+
+## Developer Tweaks
+
+### Bash completion
+
+To add bash completion add this line to your `~/.bashrc`:
+
+```Shell
+source /etc/profile.d/bash_completion.sh
+```
+
+If you are not sure how to do it, here is an one liner:
+
+```Shell
+grep -wq '^source /etc/profile.d/bash_completion.sh' ~/.bashrc \
+  || echo 'source /etc/profile.d/bash_completion.sh' >> ~/.bashrc
+```
+
+The completion will start working on new terminals.
+
+### GPG Agent
+
+The gpg-agent should be up and running by default.
+
+### SSH Agent
+
+The ssh-agent should be up and running by default. You can add keys via the
+command line:
+
+```bash
+ssh-add -l ~/.ssh/id_rsa
+```
+
+### Verify Jenkinsfiles
+
+The SRE and Testing chapters work excesively with Jenkins. Add this function to
+your `.bashrc` file to be able to validate Jenkinsfile using our Jenkins
+instance, substituing the `user` in curl:
+
+```Shell
+# Jenkins domain ci.jenkinsdomain.io is an example
+jenkins-validate() {
+    _file=${1:-Jenkinsfile}
+    curl --user $(pass ci.jenkinsdomain.io/user) -X POST -F "jenkinsfile=<$_file" https://ci.jenkinsdomain.io/pipeline-model-converter/validate
+}
+```
+
+In the example I use a program (`pass`) to store my credentials. Pass relies on
+the gpg-agent to keep my password secure. The contents of the secret are my
+Jenkins credentials, in the form `username:password`.
+
+Do remember that script sections in Jenkinsfiles cannot be validated, so your
+only way to test them is runtime.
+
+### Terminal and Editor customization
+
+#### Terminator Themes
+
+- [Terminator Themes](https://github.com/EliverLara/terminator-themes)
+
+```bash
+# Terminator configs under
+ll ~/.config/terminator/
+```
+
+#### Bash Git Prompt
+
+- [Bash Git Prompt](https://github.com/magicmonty/bash-git-prompt)
+
+#### Vim Colorschemes
+
+- [Personal Repo](https://bitbucket.org/dreamPathsProjekt/vim_bash_profiles/src/master/)
+
+#### K8s Prompt
+
+- [Kube PS1](https://github.com/jonmosco/kube-ps1)
