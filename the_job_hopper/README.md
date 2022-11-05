@@ -36,13 +36,29 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
     - [Screenrecorder - Pass](#screenrecorder---pass)
   - [Install Development Tools](#install-development-tools)
     - [Common](#common)
+    - [VsCode](#vscode)
+    - [Docker Daemon & Tools](#docker-daemon--tools)
+      - [Docker CE](#docker-ce)
+      - [Docker Compose](#docker-compose)
+      - [Lazydocker](#lazydocker)
+    - [Version Managers](#version-managers)
+      - [`asdf` - CLI Tools Version Manager](#asdf---cli-tools-version-manager)
+      - [`nvm` - Node Version Manager](#nvm---node-version-manager)
+      - [`gvm` - Go Version Manager](#gvm---go-version-manager)
+      - [`pyenv` - Python virtualenvs and versions](#pyenv---python-virtualenvs-and-versions)
+      - [`tfenv` - Terraform Version Manager](#tfenv---terraform-version-manager)
+    - [`chezmoi` - Dotfile management](#chezmoi---dotfile-management)
+    - [ASDF Packages](#asdf-packages)
+      - [Kubernetes Tools](#kubernetes-tools)
   - [Developer Tweaks](#developer-tweaks)
+    - [Global .gitconfig](#global-gitconfig)
     - [Bash completion](#bash-completion)
     - [GPG Agent](#gpg-agent)
     - [SSH Agent](#ssh-agent)
     - [Verify Jenkinsfiles](#verify-jenkinsfiles)
     - [Terminal and Editor customization](#terminal-and-editor-customization)
       - [Terminator Themes](#terminator-themes)
+      - [Terminator Profile settings](#terminator-profile-settings)
       - [Bash Git Prompt](#bash-git-prompt)
       - [Vim Colorschemes](#vim-colorschemes)
       - [K8s Prompt](#k8s-prompt)
@@ -654,23 +670,189 @@ debug:
 
 ```bash
 sudo apt install curl mosh silversearcher-ag
+# Install terminator repo and app
+sudo add-apt-repository ppa:mattrose/terminator
+sudo apt update
+sudo apt install terminator
 ```
 
 - curl: the well known tool to perform requests to web servers
 - mosh: the mobile shell can be used for persistent ssh sessions
 - silversearcher-ag: better than grep for searching source code
+- terminator: a better terminal emulator
 
-Can be found on asdf:
+### VsCode
 
-- tmux: shell session manager, better than screen
-- shellcheck: shell script analysis tool, required by the SRE chapter
-- jq: manipulate JSON in the command line, useful for scripting and working with JSON APIs
+Install VsCode as `apt` package (preferred), or with snap: `sudo snap install --classic code`
+
+```bash
+sudo apt install software-properties-common apt-transport-https wget
+wget -q https://packages.microsoft.com/keys/microsoft.asc -O- | sudo apt-key add -
+sudo add-apt-repository "deb [arch=amd64] https://packages.microsoft.com/repos/vscode stable main"
+sudo apt update
+sudo apt install code
+```
+
+- Don't forget to setup __settings sync__ with Github account, to allow for transfer of settings and plugins across machines.
+- Also backup/import exported workspaces in `.vscode/workspaces`
+- Deprecated/Not-found plugins can be backed/imported from `.vscode/extensions` as folders.
+
+### Docker Daemon & Tools
+
+#### Docker CE
+
+#### Docker Compose
+
+#### Lazydocker
+
+### Version Managers
+
+Version managers allow us to maintain various multiple versions of cli tools and languages/sdks, on the same machine.
+
+#### `asdf` - CLI Tools Version Manager
+
+One of the most powerful tools in your toolchain is `asdf` the linux/macOS cli version manager.
+It allows to maintain multiple cli tool versions on the same machine, without conflicts, either globally or with different version requirements per folder.
+
+- Install `asdf:`
+
+```bash
+# Install a latest stable version e.g. v0.10.2
+git clone https://github.com/asdf-vm/asdf.git ~/.asdf --branch v0.10.2
+# Also add to .bashrc
+. $HOME/.asdf/asdf.sh
+# Also add completion to .bashrc
+. $HOME/.asdf/completions/asdf.bash
+# Download plugins list
+asdf update
+# List all installed plugins
+asdf plugin-list
+# List all downloadable plugins
+asdf plugin-list-all
+```
+
+- Install a plugin == cli or application
+
+```bash
+asdf plugin-add kubectl
+```
+
+- Install a version
+
+```bash
+# List versions
+asdf list-all kubectl
+# Install a version
+asdf install kubectl 1.18.20
+# Install another version
+asdf install kubectl 1.24.7
+# Use globally (not only on cwd) a version
+asdf global kubectl 1.18.20
+# If a system version exists e.g. in /usr/local/bin, you can revert anytime to system version:
+asdf global kubectl system
+# Global versions
+cat $HOME/.tool-versions
+# List current binary shim
+which kubectl
+/home/<user>/.asdf/shims/kubectl
+
+chezmoi 2.26.0
+kubectl 1.18.20
+```
+
+#### `nvm` - Node Version Manager
+
+#### `gvm` - Go Version Manager
+
+#### `pyenv` - Python virtualenvs and versions
+
+#### `tfenv` - Terraform Version Manager
+
+### `chezmoi` - Dotfile management
+
+`chezmoi` helps you manage your personal configuration files (dotfiles, like `~/.gitconfig` or `~/.bashrc`) across multiple machines.
+
+- [Chezmoi documentation](https://www.chezmoi.io/user-guide/command-overview/)
+- Install `chezmoi` using `asdf`
+
+```bash
+asdf plugin-add chezmoi
+asdf install chezmoi 2.26.0
+asdf global chezmoi 2.26.0
+```
+
+- Recover a dotfiles repository, will clone the remote dotfile/s repo to `~/.local/share/chezmoi/` by default.
+
+```bash
+chezmoi init git@github.com:dreamPathsProjekt/dotfile.git
+```
+
+- Preview dotfiles differences and apply (create/write existing dotfiles)
+
+```bash
+# Preview
+chezmoi diff
+# or
+chezmoit apply --dry-run -v
+# Write
+chezmoi apply
+# or
+chezmoi apply -v
+```
+
+### ASDF Packages
+
+- `tmux`: shell session manager, better than screen.
+- `shellcheck`: shell script analysis tool, required by the SRE/DevOps chapter for safe bash scripting.
+- `jq`: manipulate JSON in the command line, useful for scripting and working with JSON APIs.
+  - Maintain multiple versions such as `1.6 (latest)` for `debian apt` and `1.5` for older e.g. `alpine apk`, to troubleshoot issues with alpine docker images.
+  `-` `asdf install jq 1.6; asdf install jq 1.5`
+- `yq`: jq for YAML.f
+  - Maintain multiple versions similar to `jq`.
+- `fzf`: fuzzy search for the cmd line.
+- `awscli`: AWS CLI.
+- `terraform`:
+
+#### Kubernetes Tools
+
+- `kubectl`: The Kubernetes native client.
+- `kubectx`: Kubernetes context manager.
+- `kubens`: Kubernetes namespace manager.
+- `k9s`: The K8s dashboard in-terminal.
+- `kind`: Local Kubernetes in docker.
+- `helm`: The Kubernetes package manager.
+- `kustomize`: The Kubernetes native manifest package manager.
+- `argocd`: ArgoCD cli.
+- `popeye`: The Kubernetes policy & best-practice manager.
+- `mizu`: The Kubernetes packet tracing tool.
+- `eksctl`: The AWS EKS cli.
 
 ## Developer Tweaks
 
+### Global .gitconfig
+
+```bash
+# Add your global settings to new ~/.gitconfig file
+git config --global pull.rebase false
+git config --global user.email "dream.paths.projekt@gmail.com"
+git config --global user.name "dreamPathsProjekt"
+# Review config
+git config --global --list
+pull.rebase=false
+user.email=dream.paths.projekt@gmail.com
+user.name=dreamPathsProjekt
+# Add file to chezmoi dotfiles management and push to remote
+chezmoi add ~/.gitconfig
+cd ~/.local/share/chezmoi
+git add --all
+git commit -m "Add .gitconfig"
+git push
+```
+
 ### Bash completion
 
-To add bash completion add this line to your `~/.bashrc`:
+On `20.04` bash completion should be added by default.
+To add bash completion, if not, add this line to your `~/.bashrc`:
 
 ```Shell
 source /etc/profile.d/bash_completion.sh
@@ -696,6 +878,12 @@ command line:
 
 ```bash
 ssh-add -l ~/.ssh/id_rsa
+# Start the agent
+eval $(ssh-agent -s)
+# Import and add git repository private keys
+ssh-add ~/.ssh/github.pem
+ssh-add ~/.ssh/bitbucket.pem
+ssh-add ~/.ssh/gitlab.pem
 ```
 
 ### Verify Jenkinsfiles
@@ -728,11 +916,46 @@ only way to test them is runtime.
 ```bash
 # Terminator configs under
 ll ~/.config/terminator/
+mkdir -vp $HOME/.config/terminator/plugins
+# For terminator >= 1.9
+wget https://git.io/v5Zww -O $HOME"/.config/terminator/plugins/terminator-themes.py"
+# For terminator < 1.9
+wget https://git.io/v5Zwz -O $HOME"/.config/terminator/plugins/terminator-themes.py"
 ```
+
+- Activate: Check the `TerminatorThemes` option under `terminator` > `preferences` > `plugins`
+- Install: Open the terminator context menu and select `Themes`. Select you favorite theme and click install (you can preview available themes before installing).
+
+#### Terminator Profile settings
+
+- `Profiles` -> `default` -> `General` & `Profiles` -> `Blazer` (custom) -> `General` : `Font`: _Monospace Regular 10/12_
+  - Same `General` tab -> `Cursor`: I-Beam
+  - `Background` tab -> `Transparent background` with `0.7` - `0.8`
+- `Layouts` -> `default` -> `Terminal terminal1` select `Profile`: `Blazer` (custom)
+- _Always split with current profile_ setting:
+
+  ```bash
+  vim ~/.config/terminator/config
+  # Under [global_config] section, add line
+  always_split_with_profile = True
+  ```
 
 #### Bash Git Prompt
 
 - [Bash Git Prompt](https://github.com/magicmonty/bash-git-prompt)
+- Install
+
+```bash
+git clone https://github.com/magicmonty/bash-git-prompt.git ~/.bash-git-prompt --depth=1 --branch 2.7.1
+# Current shell
+export GIT_PROMPT_ONLY_IN_REPO=1
+source $HOME/.bash-git-prompt/gitprompt.sh
+# Add to ~/.bashrc
+if [ -f "$HOME/.bash-git-prompt/gitprompt.sh" ]; then
+    GIT_PROMPT_ONLY_IN_REPO=1
+    source $HOME/.bash-git-prompt/gitprompt.sh
+fi
+```
 
 #### Vim Colorschemes
 
