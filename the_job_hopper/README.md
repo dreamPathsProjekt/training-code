@@ -24,6 +24,7 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
     - [Yubikey Authentication](#yubikey-authentication)
     - [AptX (Bluetooth HQ Audio)](#aptx-bluetooth-hq-audio)
     - [Mount /tmp on tmpfs](#mount-tmp-on-tmpfs)
+    - [Solve Ubuntu SystemD Issues](#solve-ubuntu-systemd-issues)
   - [Install Productivity Tools](#install-productivity-tools)
     - [Chrome](#chrome)
     - [Slack](#slack)
@@ -343,7 +344,7 @@ login to an Ubuntu session, then:
 ```bash
 sudo apt remove kubuntu-desktop
 sudo apt autoremove
-sudo apt insta ppa-purge
+sudo apt install ppa-purge
 sudo ppa-purge ppa:kubuntu-ppa/backports
 sudo rm /etc/apt/sources.list.d/kubuntu-ppa-ubuntu-backports-focal.list
 sudo apt install kde-full
@@ -499,6 +500,24 @@ supported.
 sudo systemctl enable /usr/share/systemd/tmp.mount
 Created symlink /etc/systemd/system/local-fs.target.wants/tmp.mount → /usr/share/systemd/tmp.mount.
 Created symlink /etc/systemd/system/tmp.mount → /usr/share/systemd/tmp.mount.
+```
+
+### Solve Ubuntu SystemD Issues
+
+- [fwupd-refresh.service](https://askubuntu.com/questions/1404691/fwupd-refresh-service-failed)
+
+```bash
+systemctl list-units --state failed
+  UNIT                  LOAD   ACTIVE SUB    DESCRIPTION
+● fwupd-refresh.service loaded failed failed Refresh fwupd metadata and update motd
+
+# Edit service unit override.conf
+sudo systemctl edit fwupd-refresh.service
+# Add lines
+[Service]
+DynamicUser=no
+
+systemctl restart fwupd-refresh.service
 ```
 
 ## Install Productivity Tools
@@ -714,6 +733,10 @@ Version managers allow us to maintain various multiple versions of cli tools and
 One of the most powerful tools in your toolchain is `asdf` the linux/macOS cli version manager.
 It allows to maintain multiple cli tool versions on the same machine, without conflicts, either globally or with different version requirements per folder.
 
+- [Getting Started - asdf documentation](https://asdf-vm.com/guide/getting-started.html)
+- [Community Plugins](https://github.com/asdf-community)
+- [Plugin Index](https://github.com/asdf-vm/asdf-plugins)
+
 - Install `asdf:`
 
 ```bash
@@ -762,9 +785,132 @@ kubectl 1.18.20
 
 #### `nvm` - Node Version Manager
 
+`nvm` allows you to quickly install and use different versions of node via the command line.
+
+To install or update `nvm`, you should run the install script.
+To do that, you may either download and run the script manually, or use the following cURL or Wget command:
+
+```bash
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+# or
+wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.2/install.sh | bash
+```
+
+Running either of the above commands downloads a script and runs it. The script clones the nvm repository to `~/.nvm`, and attempts to add the source lines from the snippet below to the correct profile file (`~/.bash_profile`, `~/.zshrc`, `~/.profile`, or `~/.bashrc`).
+
+```bash
+export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh" # This loads nvm
+```
+
 #### `gvm` - Go Version Manager
 
+GVM provides an interface to manage Go versions.
+
+Features:
+
+- Install/Uninstall Go versions with `gvm install [tag]` where tag is `"60.3"`, `"go1"`, `"weekly.2011-11-08"`, or `"tip"`
+- List added/removed files in `GOROOT` with `gvm diff`
+- Manage `GOPATHs` with gvm `pkgset [create/use/delete] [name]`. Use `--local` as name to manage repository under local path (`/path/to/repo/.gvm_local`).
+- List latest release tags with gvm listall. Use `--all` to list weekly as well.
+- Cache a clean copy of the latest Go source for multiple version installs.
+- Link project directories into `GOPATH`
+
+Install - Usage:
+
+- Install `gvm`, from `master` version (tags have stopped since 2014)
+
+```bash
+# Prerequisites Debian/Ubuntu
+sudo apt install curl git mercurial make binutils bison gcc build-essential
+# Usually on 20.04
+gcc is already the newest version (4:9.3.0-1ubuntu2).
+gcc set to manually installed.
+make is already the newest version (4.2.1-1.2).
+make set to manually installed.
+binutils is already the newest version (2.34-6ubuntu1.3).
+binutils set to manually installed.
+curl is already the newest version (7.68.0-1ubuntu2.14).
+git is already the newest version (1:2.25.1-1ubuntu3.6).
+git set to manually installed.
+
+# Installer
+bash < <(curl -s -S -L https://raw.githubusercontent.com/moovweb/gvm/master/binscripts/gvm-installer)
+# Can also be added to .bashrc
+source $HOME/.gvm/scripts/gvm
+# Setup autocomplete - paste in .bashrc
+source "$HOME/.gvm/scripts/completion"
+```
+
+- Install a `golang` version
+
+```bash
+# Install a go version
+gvm install go1.18.8 --with-protobuf --with-build-tools --prefer-binary
+gvm use go1.18.8
+
+# GOROOT & GOPATH
+echo $GOROOT
+/home/<username>/.gvm/gos/go1.18.8
+echo $GOPATH
+/home/<username>/.gvm/gos/go1.18.8/global
+# The above directory is a link, does not exist. Contents exist in global pkgset:
+~/.gvm/pkgsets/go1.18.8/global/
+
+# Run go get of a package
+go get -v github.com/segmentio/kafka-go
+# Inspect the package binary
+ll ~/.gvm/pkgsets/go1.18.8/global/pkg/linux_amd64/github.com/segmentio
+kafka-go.a
+# Inspect package src
+ll ~/.gvm/pkgsets/go1.18.8/global/src/github.com/segmentio
+
+total 0
+drwxrwxrwx 1 dritsas dritsas 512 Apr 10 13:24 ./
+drwxrwxrwx 1 dritsas dritsas 512 Apr 10 13:24 ../
+drwxrwxrwx 1 dritsas dritsas 512 Apr 10 13:24 kafka-go/
+```
+
+- Install GO bash completion
+
+```Bash
+sudo wget https://raw.github.com/kura/go-bash-completion/master/etc/bash_completion.d/go -O /etc/bash_completion.d/go
+. ~/.bashrc
+```
+
+- List all Go installed packages - global & std lib also
+
+```Bash
+go list '...'
+```
+
+- Use GVM `linkthis`
+
+```Bash
+# Create symlink of package/module to $GOPATH/src/
+
+gvm linkthis -h
+Usage: gvm linkthis [package-name] [options]
+    -h, --help     Display this message.
+    -f, --force    Remove existing destination and create symlink again.
+
+If the [package-name] is provided, it will be used in the path based
+at ${GOPATH%%:*}/src, e.g.:
+
+    gvm linkthis github.com/moovweb/gpkg
+
+If omitted, the [package-name] will be the basename of the current
+directory, e.g. 'cards'.
+
+# To remove a symlink created (e.g. cards)
+unlink $GOPATH/src/cards
+```
+
+- Use GVM `pkgset` to separate package sets, within the same version
+
 #### `pyenv` - Python virtualenvs and versions
+
+
 
 #### `tfenv` - Terraform Version Manager
 
@@ -806,22 +952,26 @@ chezmoi apply -v
 - `shellcheck`: shell script analysis tool, required by the SRE/DevOps chapter for safe bash scripting.
 - `jq`: manipulate JSON in the command line, useful for scripting and working with JSON APIs.
   - Maintain multiple versions such as `1.6 (latest)` for `debian apt` and `1.5` for older e.g. `alpine apk`, to troubleshoot issues with alpine docker images.
-  `-` `asdf install jq 1.6; asdf install jq 1.5`
+  - `asdf install jq 1.6; asdf install jq 1.5`
 - `yq`: jq for YAML.f
   - Maintain multiple versions similar to `jq`.
 - `fzf`: fuzzy search for the cmd line.
 - `awscli`: AWS CLI.
-- `terraform`:
+- `terraform`: Multiple Terraform versions. Alternative to using [tfenv](#tfenv---terraform-version-manager)
+- `packer`
+- `tflint`: Terraform Linter.
+- `golangci-lint`: Fast linters runner for Go.
 
 #### Kubernetes Tools
 
 - `kubectl`: The Kubernetes native client.
 - `kubectx`: Kubernetes context manager.
 - `kubens`: Kubernetes namespace manager.
+- `kubeval`: Kubernetes manifest validator.
 - `k9s`: The K8s dashboard in-terminal.
 - `kind`: Local Kubernetes in docker.
 - `helm`: The Kubernetes package manager.
-- `kustomize`: The Kubernetes native manifest package manager.
+- `kustomize`: Kubernetes native configuration management.
 - `argocd`: ArgoCD cli.
 - `popeye`: The Kubernetes policy & best-practice manager.
 - `mizu`: The Kubernetes packet tracing tool.
@@ -959,7 +1109,36 @@ fi
 
 #### Vim Colorschemes
 
-- [Personal Repo](https://bitbucket.org/dreamPathsProjekt/vim_bash_profiles/src/master/)
+- [Vim Colorschemes Repository](https://github.com/flazz/vim-colorschemes)
+- [Personal Repository](https://bitbucket.org/dreamPathsProjekt/vim_bash_profiles/src/master/)
+
+- Install colorschemes
+
+```bash
+# Add colorschemes to vim
+mkdir -vp ~/.vim
+git clone https://github.com/flazz/vim-colorschemes.git ~/.vim
+# To change the colorscheme of Vim, add to your .vimrc:
+colorscheme <nameofcolorscheme>
+# Example molokai
+colorscheme molokai
+# Inside vim
+:colorscheme molokai
+```
+
+- Migrate legacy `.vimrc` if not in dotfiles.
+
+```bash
+git clone git@bitbucket.org:dreamPathsProjekt/vim_bash_profiles.git ~/.vim-profiles
+cp -v ~/.vim-profiles/.vimrc ~/.vimrc
+# Inherit .vimrc to chezmoi
+chezmoi add ~/.vimrc
+# Commit and push using chezmoi git commands
+chezmoi git add dot_vimrc
+# Example chezmoi git syntax, can be triggered from any working directory:
+chezmoi git -- commit -m "Add .vimrc"
+chezmoi git -- push
+```
 
 #### K8s Prompt
 
