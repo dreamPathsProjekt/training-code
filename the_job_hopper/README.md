@@ -70,6 +70,7 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
       - [Vim Colorschemes](#vim-colorschemes)
       - [K8s Prompt](#k8s-prompt)
       - [Jetbrains Toolbox](#jetbrains-toolbox)
+      - [AWS Profiles](#aws-profiles)
 
 ## Change Passwords
 
@@ -1391,8 +1392,6 @@ chezmoi git -- push
 https://github.com/jonmosco/kube-ps1 ~/.local/share/kube-ps1
 # Better to use .bashrc
 source /path/to/kube-ps1.sh
-# Include into existing PS1 variable
-PS1='[\u@\h \W $(kube_ps1)]\$ '
 # .bashrc version to include normal prompt
 if [ "$color_prompt" = yes ]; then
     PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $(kube_ps1)\$ '
@@ -1405,6 +1404,40 @@ unset color_prompt force_color_prompt
 #### Jetbrains Toolbox
 
 ```bash
+# Install to /opt/jetbrains-toolbox with ln -s to /usr/local/bin
+curl -fsSL https://raw.githubusercontent.com/nagygergo/jetbrains-toolbox-install/master/jetbrains-toolbox.sh | bash
+
+# If downloaded to ~/.local/share/JetBrains manually
 # Inside ~/.bash_aliases
 alias jetbrains="~/.local/share/JetBrains/Toolbox/bin/jetbrains-toolbox"
+
+# Use
+jetbrains-toolbox &
+# Or
+jetbrains &
+```
+
+#### AWS Profiles
+
+- Create new named profiles
+
+```bash
+# Profile named legacy
+aws configure --profile legacy
+cat ~/.aws/config
+[profile legacy]
+region = eu-west-1
+output = json
+
+# Default profile
+aws configure
+```
+
+- Use named profiles
+
+```bash
+aws ec2 describe-instances --profile legacy
+# Alternative use environment variables
+export AWS_PROFILE=legacy
+aws ec2 describe-instances
 ```
