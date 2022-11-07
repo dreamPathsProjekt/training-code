@@ -1197,17 +1197,18 @@ chezmoi apply -v ~/.vimrc
 - `fzf`: fuzzy search for the cmd line.
 - `awscli`: AWS CLI.
 - `terraform`: Multiple Terraform versions. Alternative to using [tfenv](#tfenv---terraform-version-manager)
-- `packer`
+- `packer`: Hashicorp Packer.
 - `tflint`: Terraform Linter.
 - `lazydocker`: Docker terminal GUI (similar to K9s).
   - Custom `asdf` plugin: `asdf plugin-add lazydocker https://github.com/comdotlinux/asdf-lazydocker.git`
 - `golangci-lint`: Fast linters runner for Go.
+- `k6`: The best developer experience for load testing.
 
 #### Kubernetes Tools
 
 - `kubectl`: The Kubernetes native client.
 - `kubectx`: Kubernetes context manager.
-- `kubens`: Kubernetes namespace manager.
+- `kubens`: Kubernetes namespace manager. Installed from `kubectx` package as a bundle.
 - `kubeval`: Kubernetes manifest validator.
 - `k9s`: The K8s dashboard in-terminal.
 - `kind`: Local Kubernetes in docker.
@@ -1215,7 +1216,7 @@ chezmoi apply -v ~/.vimrc
 - `kustomize`: Kubernetes native configuration management.
 - `argocd`: ArgoCD cli.
 - `popeye`: The Kubernetes policy & best-practice manager.
-- `mizu`: The Kubernetes packet tracing tool.
+- `mizu`: The Kubernetes packet tracing tool. Not on `asdf`
 - `eksctl`: The AWS EKS cli.
 - `kubebuilder`: Kubebuilder is a framework for building Kubernetes APIs using custom resource definitions (`CRDs`).
 
@@ -1385,6 +1386,21 @@ chezmoi git -- push
 #### K8s Prompt
 
 - [Kube PS1](https://github.com/jonmosco/kube-ps1)
+
+```bash
+https://github.com/jonmosco/kube-ps1 ~/.local/share/kube-ps1
+# Better to use .bashrc
+source /path/to/kube-ps1.sh
+# Include into existing PS1 variable
+PS1='[\u@\h \W $(kube_ps1)]\$ '
+# .bashrc version to include normal prompt
+if [ "$color_prompt" = yes ]; then
+    PS1='${debian_chroot:+($debian_chroot)}\[\033[01;32m\]\u@\h\[\033[00m\]:\[\033[01;34m\]\w\[\033[00m\] $(kube_ps1)\$ '
+else
+    PS1='${debian_chroot:+($debian_chroot)}\u@\h:\w $(kube_ps1)\$'
+fi
+unset color_prompt force_color_prompt
+```
 
 #### Jetbrains Toolbox
 
