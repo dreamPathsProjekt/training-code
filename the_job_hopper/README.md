@@ -27,6 +27,10 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
     - [Solve Ubuntu SystemD Issues](#solve-ubuntu-systemd-issues)
   - [Install Productivity Tools](#install-productivity-tools)
     - [Chrome](#chrome)
+    - [Zoom](#zoom)
+      - [Via Deb](#via-deb)
+      - [Via Snap](#via-snap)
+      - [Tools for Zoom](#tools-for-zoom)
     - [Slack](#slack)
       - [Via Deb Package](#via-deb-package)
       - [Via Snap Package](#via-snap-package)
@@ -34,19 +38,21 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
     - [OpenVPN3 - Terminal](#openvpn3---terminal)
       - [OpenVPN3 Installation](#openvpn3-installation)
       - [OpenVPN3 Usage](#openvpn3-usage)
+    - [Printunl Client - VPN](#printunl-client---vpn)
     - [Screenrecorder - Pass](#screenrecorder---pass)
   - [Install Development Tools](#install-development-tools)
     - [Common](#common)
     - [VsCode](#vscode)
-    - [Docker Daemon & Tools](#docker-daemon--tools)
+    - [Docker CE & Tools](#docker-ce--tools)
       - [Docker CE](#docker-ce)
-      - [Docker Compose](#docker-compose)
+      - [Docker Compose Standalone](#docker-compose-standalone)
       - [Lazydocker](#lazydocker)
     - [Version Managers](#version-managers)
       - [`asdf` - CLI Tools Version Manager](#asdf---cli-tools-version-manager)
       - [`nvm` - Node Version Manager](#nvm---node-version-manager)
       - [`gvm` - Go Version Manager](#gvm---go-version-manager)
       - [`pyenv` - Python virtualenvs and versions](#pyenv---python-virtualenvs-and-versions)
+    - [Use shell python version - Set or show the global Python Version](#use-shell-python-version---set-or-show-the-global-python-version)
       - [`tfenv` - Terraform Version Manager](#tfenv---terraform-version-manager)
     - [`chezmoi` - Dotfile management](#chezmoi---dotfile-management)
     - [ASDF Packages](#asdf-packages)
@@ -543,6 +549,56 @@ curl -L https://dl.google.com/linux/linux_signing_key.pub | sudo apt-key add -
 sudo apt update
 ```
 
+### Zoom
+
+There are two way to install Zoom, via the deb package and via snap. With the
+deb package you have to perform updates manually but the application is more
+performant.  With snap you get automatic updates but zoom is slower to start and
+sometimes the camera does not work.
+
+- [Official Zoom Install Page](https://support.zoom.us/hc/en-us/articles/204206269-Installing-or-updating-Zoom-on-Linux)
+- [Zoom Linux Client Changelog](https://support.zoom.us/hc/en-us/articles/205759689-Release-notes-for-Linux)
+
+#### Via Deb
+
+Download the latest [Zoom for Ubuntu from Zoom's
+website](https://zoom.us/download), then run:
+
+```bash
+wget https://zoom.us/client/latest/zoom_amd64.deb
+# Or specific version
+wget https://zoom.us/client/5.12.2.4816/zoom_amd64.deb
+sudo apt install ~/Downloads/zoom_amd64.deb
+```
+
+You will have to do the same __every time__ you want to update.
+
+#### Via Snap
+
+```bash
+sudo snap install --classic zoom-client
+```
+
+#### Tools for Zoom
+
+You can install `guvcview` to control your camera: brightness, zoom, and more
+depending on the model.
+
+Install `guvcview`:
+
+```bash
+sudo apt install guvcview
+```
+
+The when your camera is open (e.g during a Zoom call), run it to get the
+controls:
+
+```bash
+guvcview -d /dev/video4 -z
+```
+
+Tip: if you skip the `-z`, then _guvcview_ will open a camera window for you.
+
 ### Slack
 
 Like Zoom you can install Slack manually via deb, or via snap. Via deb it is
@@ -666,6 +722,20 @@ openvpn3 session-manage --disconnect --config example-udp
 openvpn3 session-manage --path /net/openvpn/v3/sessions/f911ff8es6482s4ed6sb6bbs0fb28c91fa04 --disconnect
 ```
 
+### Printunl Client - VPN
+
+```bash
+sudo tee /etc/apt/sources.list.d/pritunl.list << EOF
+deb https://repo.pritunl.com/stable/apt focal main
+EOF
+
+sudo apt --assume-yes install gnupg
+gpg --keyserver hkp://keyserver.ubuntu.com --recv-keys 7568D9BB55FF9E5287D586017AE645C0CF8E292A
+gpg --armor --export 7568D9BB55FF9E5287D586017AE645C0CF8E292A | sudo tee /etc/apt/trusted.gpg.d/pritunl.asc
+sudo apt update
+sudo apt install pritunl-client-electron
+```
+
 ### Screenrecorder - Pass
 
 - To record videos of your screen you can use _simplescreenrecorder_:
@@ -716,13 +786,78 @@ sudo apt install code
 - Also backup/import exported workspaces in `.vscode/workspaces`
 - Deprecated/Not-found plugins can be backed/imported from `.vscode/extensions` as folders.
 
-### Docker Daemon & Tools
+### Docker CE & Tools
 
 #### Docker CE
 
-#### Docker Compose
+- Clenup & requirements
+
+```bash
+sudo apt remove docker docker-engine docker.io containerd runc
+# Most already exist.
+sudo apt install \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+```
+
+- Installs
+
+```bash
+# Setup Docker CE apt repository
+sudo mkdir -vp /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+echo \
+  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+sudo apt install docker-ce docker-ce-cli containerd.io docker-compose-plugin
+# Check for docker-compose versions - these days compose debian pkg is the same as standalone latest: 2.12.2
+apt-cache madison docker-compose-plugin
+
+docker-compose-plugin | 2.12.2~ubuntu-focal | https://download.docker.com/linux/ubuntu focal/stable amd64 Packages
+docker-compose-plugin | 2.12.0~ubuntu-focal | https://download.docker.com/linux/ubuntu focal/stable amd64 Packages
+docker-compose-plugin | 2.11.2~ubuntu-focal | https://download.docker.com/linux/ubuntu focal/stable amd64 Packages
+docker-compose-plugin | 2.10.2~ubuntu-focal | https://download.docker.com/linux/ubuntu focal/stable amd64 Packages
+docker-compose-plugin | 2.6.0~ubuntu-focal | https://download.docker.com/linux/ubuntu focal/stable amd64 Packages
+docker-compose-plugin | 2.5.0~ubuntu-focal | https://download.docker.com/linux/ubuntu focal/stable amd64 Packages
+docker-compose-plugin | 2.3.3~ubuntu-focal | https://download.docker.com/linux/ubuntu focal/stable amd64 Packages
+
+# Plugin version uses syntax docker compose <command> vs. standalone docker-compose <command>.
+# Create an alias for compatibility with scripts in ~/.bash_aliases
+alias docker-compose="docker compose"
+```
+
+- Post-install steps
+
+```bash
+# Create the docker group if not exists.
+sudo groupadd docker
+# groupadd: group 'docker' already exists
+sudo usermod -aG docker $USER
+# If you’re running Linux in a virtual machine, it may be necessary to restart the virtual machine for changes to take effect.
+# Run the following command to activate the changes to groups:
+newgrp docker
+sudo systemctl enable docker.service
+sudo systemctl enable containerd.service
+```
+
+#### Docker Compose Standalone
 
 #### Lazydocker
+
+What if you had all the information you needed in one terminal window with every common command living one keypress away (and the ability to add custom commands as well). Lazydocker's goal is to make that dream a reality.
+
+- Install using [asdf](#asdf---cli-tools-version-manager)
+
+```bash
+asdf plugin-add lazydocker https://github.com/comdotlinux/asdf-lazydocker.git
+asdf list-all lazydocker
+asdf install lazydocker 0.19.0
+asdf global lazydocker 0.19.0
+```
 
 ### Version Managers
 
@@ -910,7 +1045,108 @@ unlink $GOPATH/src/cards
 
 #### `pyenv` - Python virtualenvs and versions
 
+[https://realpython.com/intro-to-pyenv/](https://realpython.com/intro-to-pyenv/)
 
+`pyenv` lets you easily switch between multiple versions of Python. It's simple, unobtrusive, and follows the UNIX tradition of single-purpose tools that do one thing well.
+
+- Install build-from-source deps
+
+```Bash
+# Working on Ubuntu 18.04 and earlier
+sudo apt-get install -y make build-essential libssl-dev zlib1g-dev \
+libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
+libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev python-openssl
+
+# Ubuntu 20.04 and newer
+sudo apt install -y make build-essential openssl libssl-dev \
+zlib1g-dev libbz2-dev libreadline-dev libsqlite3-dev wget curl llvm libncurses5-dev \
+libncursesw5-dev xz-utils tk-dev libffi-dev liblzma-dev
+```
+
+- Use the pyenv installer
+
+```Bash
+curl https://pyenv.run | bash
+
+# All python installations reside in $HOME/.pyenv
+```
+
+This will install pyenv along with a few plugins that are useful:
+
+- `pyenv`: The actual pyenv application
+- `pyenv-virtualenv`: Plugin for pyenv and virtual environments
+- `pyenv-update`: Plugin for updating pyenv
+- `pyenv-doctor`: Plugin to verify that pyenv and build dependencies are installed
+- `pyenv-which-ext`: Plugin to automatically lookup system commands
+
+- Load pyenv to system path
+
+```Bash
+# Load pyenv automatically by adding
+# the following to ~/.bashrc:
+
+echo 'export PYENV_ROOT="$HOME/.pyenv"' >> ~/.bashrc
+echo 'export PATH="$PYENV_ROOT/bin:$PATH"' >> ~/.bashrc
+echo 'eval "$(pyenv init -)"' >> ~/.bashrc
+echo 'eval "$(pyenv virtualenv-init -)"' >> ~/.bashrc
+
+# Add bash completion
+echo 'source "$(pyenv root)/completions/pyenv.bash"' >> ~/.bashrc
+
+# Changes to take effect
+exec $SHELL
+```
+
+- Install a Python Version
+
+```Bash
+# List available
+pyenv install --list
+
+# Example: install 2.7.5
+pyenv install 2.7.5
+
+# Show current version
+pyenv versions
+# All versions installed here
+ls ~/.pyenv/versions/
+
+# Uninstall a version
+pyenv uninstall 2.7.15
+```
+
+- Create and activate a virtual environment
+
+```Bash
+# Syntax
+pyenv virtualenv <version> <virtualenv name>
+
+pyenv virtualenv 2.7.5 web-app
+# Virtualenv stored in ~/.pyenv/versions/2.7.5/envs
+
+pyenv activate web-app
+# Similar to source activate and pyenv shell, pyenv local commands
+
+source deactivate
+# Similar to deactivate
+
+# show virtualenvs and their base
+pyenv virtualenvs
+```
+
+### Use shell python version - Set or show the global Python Version
+
+```Bash
+# Use shell to a python version
+pyenv shell 3.4.8
+
+# Show global version
+pyenv global
+system
+
+# Set global version
+pyenv global web-app
+```
 
 #### `tfenv` - Terraform Version Manager
 
@@ -944,6 +1180,9 @@ chezmoit apply --dry-run -v
 chezmoi apply
 # or
 chezmoi apply -v
+# Operations on a single dotfile only
+chezmoi diff ~/.vimrc
+chezmoi apply -v ~/.vimrc
 ```
 
 ### ASDF Packages
@@ -960,6 +1199,8 @@ chezmoi apply -v
 - `terraform`: Multiple Terraform versions. Alternative to using [tfenv](#tfenv---terraform-version-manager)
 - `packer`
 - `tflint`: Terraform Linter.
+- `lazydocker`: Docker terminal GUI (similar to K9s).
+  - Custom `asdf` plugin: `asdf plugin-add lazydocker https://github.com/comdotlinux/asdf-lazydocker.git`
 - `golangci-lint`: Fast linters runner for Go.
 
 #### Kubernetes Tools
@@ -976,6 +1217,7 @@ chezmoi apply -v
 - `popeye`: The Kubernetes policy & best-practice manager.
 - `mizu`: The Kubernetes packet tracing tool.
 - `eksctl`: The AWS EKS cli.
+- `kubebuilder`: Kubebuilder is a framework for building Kubernetes APIs using custom resource definitions (`CRDs`).
 
 ## Developer Tweaks
 
