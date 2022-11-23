@@ -1007,7 +1007,7 @@ drwxrwxrwx 1 dritsas dritsas 512 Apr 10 13:24 ../
 drwxrwxrwx 1 dritsas dritsas 512 Apr 10 13:24 kafka-go/
 ```
 
-- Install GO bash completion
+- Install GO bash completion (unmaintained repo)
 
 ```Bash
 sudo wget https://raw.github.com/kura/go-bash-completion/master/etc/bash_completion.d/go -O /etc/bash_completion.d/go
