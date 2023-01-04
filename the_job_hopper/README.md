@@ -43,7 +43,7 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
   - [Install Development Tools](#install-development-tools)
     - [Common](#common)
     - [VsCode](#vscode)
-    - [Docker CE & Tools](#docker-ce--tools)
+    - [Docker CE \& Tools](#docker-ce--tools)
       - [Docker CE](#docker-ce)
       - [Docker Compose Standalone](#docker-compose-standalone)
       - [Lazydocker](#lazydocker)
@@ -1043,6 +1043,43 @@ unlink $GOPATH/src/cards
 ```
 
 - Use GVM `pkgset` to separate package sets, within the same version
+
+- Empty GVM `pkgset` cleanly
+
+```Bash
+# Outside of a project folder
+gvm use go1.18.8
+gvm pkgset list
+# Output
+
+gvm go package sets (go1.18.8)
+
+    actionsWorkspace
+=>  censolApi
+    global
+
+# Make sure to use pkgset and not on a go project folder.
+gvm pkgset use censolApi
+Now using version go1.18.8@censolApi
+
+# Clean entire mod cache (modules) - this affects other pkgsets as well.
+go clean -modcache
+gvm pkgset empty
+
+# Or simply, without affecting other pkgsets
+sudo rm -vrf ~/.gvm/pkgsets/go1.18.8/censolApi/*
+
+go help clean
+# Output
+The -cache flag causes clean to remove the entire go build cache.
+
+The -testcache flag causes clean to expire all test results in the
+go build cache.
+
+The -modcache flag causes clean to remove the entire module
+download cache, including unpacked source code of versioned
+dependencies.
+```
 
 #### `pyenv` - Python virtualenvs and versions
 

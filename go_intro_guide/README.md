@@ -6,12 +6,13 @@
   - [Udemy Courses](#udemy-courses)
     - [Go Complete](#go-complete)
       - [Go main commands](#go-main-commands)
+      - [Remove modules installed with go get](#remove-modules-installed-with-go-get)
       - [Packages Executable vs Reusable](#packages-executable-vs-reusable)
       - [Deeper: Variables/Functions/Slices/Types](#deeper-variablesfunctionsslicestypes)
-      - [Structs & Pointers](#structs--pointers)
+      - [Structs \& Pointers](#structs--pointers)
       - [Maps](#maps)
       - [Interfaces](#interfaces)
-      - [Channels & Go Routines](#channels--go-routines)
+      - [Channels \& Go Routines](#channels--go-routines)
     - [GRPC MAsterclass](#grpc-masterclass)
     - [Concurrency in GO](#concurrency-in-go)
     - [Go Serverless](#go-serverless)
@@ -22,7 +23,7 @@
       - [Prototype](#prototype)
       - [Singleton](#singleton)
     - [Go Rest Microservices](#go-rest-microservices)
-  - [Configuration & VSCode issues](#configuration--vscode-issues)
+  - [Configuration \& VSCode issues](#configuration--vscode-issues)
   - [Interesting SO Questions](#interesting-so-questions)
   - [Notes from `koslib`](#notes-from-koslib)
 
@@ -80,6 +81,49 @@ sudo wget https://raw.github.com/kura/go-bash-completion/master/etc/bash_complet
 - `install` - compile and install package
 - `get` - download module or package source code
 - `test` - runs tests
+
+#### Remove modules installed with go get
+
+```Shell
+go clean -i -n github.com/valyala/fasthttp...
+# Output
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0
+rm -f fasthttp@v1.43.0.test fasthttp@v1.43.0.test.exe fasthttp.test fasthttp.test.exe bytesconv_32 bytesconv_32.exe bytesconv_32.test bytesconv_32.test.exe bytesconv_32_test bytesconv_32_test.exe bytesconv_table_gen bytesconv_table_gen.exe tcp_windows tcp_windows.exe uri_windows uri_windows.exe uri_windows.test uri_windows.test.exe uri_windows_test uri_windows_test.exe
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/examples/client
+rm -f client client.exe client client.exe client.test client.test.exe client.test client.test.exe client client.exe
+rm -f /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/bin/client
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/examples/fileserver
+rm -f fileserver fileserver.exe fileserver fileserver.exe fileserver.test fileserver.test.exe fileserver.test fileserver.test.exe fileserver fileserver.exe
+rm -f /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/bin/fileserver
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/examples/helloworldserver
+rm -f helloworldserver helloworldserver.exe helloworldserver helloworldserver.exe helloworldserver.test helloworldserver.test.exe helloworldserver.test helloworldserver.test.exe helloworldserver helloworldserver.exe
+rm -f /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/bin/helloworldserver
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/examples/host_client
+rm -f host_client host_client.exe host_client host_client.exe host_client.test host_client.test.exe host_client.test host_client.test.exe hostclient hostclient.exe
+rm -f /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/bin/host_client
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/examples/letsencrypt
+rm -f letsencrypt letsencrypt.exe letsencrypt letsencrypt.exe letsencrypt.test letsencrypt.test.exe letsencrypt.test letsencrypt.test.exe letsencryptserver letsencryptserver.exe
+rm -f /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/bin/letsencrypt
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/examples/multidomain
+rm -f multidomain multidomain.exe multidomain multidomain.exe multidomain.test multidomain.test.exe multidomain.test multidomain.test.exe multidomain multidomain.exe
+rm -f /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/bin/multidomain
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/expvarhandler
+rm -f expvarhandler.test expvarhandler.test.exe expvarhandler.test expvarhandler.test.exe
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/fasthttpadaptor
+rm -f fasthttpadaptor.test fasthttpadaptor.test.exe fasthttpadaptor.test fasthttpadaptor.test.exe
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/fasthttpproxy
+rm -f fasthttpproxy.test fasthttpproxy.test.exe fasthttpproxy.test fasthttpproxy.test.exe
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/fasthttputil
+rm -f fasthttputil.test fasthttputil.test.exe fasthttputil.test fasthttputil.test.exe
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/pprofhandler
+rm -f pprofhandler.test pprofhandler.test.exe pprofhandler.test pprofhandler.test.exe
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/prefork
+rm -f prefork.test prefork.test.exe prefork.test prefork.test.exe
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/reuseport
+rm -f reuseport.test reuseport.test.exe reuseport.test reuseport.test.exe reuseport_aix reuseport_aix.exe reuseport_windows reuseport_windows.exe
+cd /home/dritsas/.gvm/pkgsets/go1.18.8/censolApi/pkg/mod/github.com/valyala/fasthttp@v1.43.0/stackless
+rm -f stackless.test stackless.test.exe stackless.test stackless.test.exe
+```
 
 #### Packages Executable vs Reusable
 
