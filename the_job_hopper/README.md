@@ -25,6 +25,7 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
     - [AptX (Bluetooth HQ Audio)](#aptx-bluetooth-hq-audio)
     - [Mount /tmp on tmpfs](#mount-tmp-on-tmpfs)
     - [Solve Ubuntu SystemD Issues](#solve-ubuntu-systemd-issues)
+    - [Increase `/swapfile` - Change Swapiness](#increase-swapfile---change-swapiness)
   - [Install Productivity Tools](#install-productivity-tools)
     - [Chrome](#chrome)
     - [Zoom](#zoom)
@@ -525,6 +526,117 @@ sudo systemctl edit fwupd-refresh.service
 DynamicUser=no
 
 systemctl restart fwupd-refresh.service
+```
+
+- On Dell laptops with Ubuntu installed, solve issue with `dell-linux-assistant` non-existent PPA
+
+```bash
+# How to check package repository
+sudo apt-cache policy dell-linux-assistant
+dell-linux-assistant:
+  Installed: 2.2.0548
+  Candidate: 2.2.0548
+  Version table:
+ *** 2.2.0548 500
+        500 http://ppa.launchpad.net/somerville-dla-team/ppa/ubuntu focal/main amd64 Packages
+        100 /var/lib/dpkg/status
+     2.2.0545 500
+        500 http://ppa.launchpad.net/somerville-dla-team/ppa/ubuntu bionic/main amd64 Packages
+
+# Add the missing repository
+sudo add-apt-repository ppa:somerville-dla-team/ppa
+
+ More info: https://launchpad.net/~somerville-dla-team/+archive/ubuntu/ppa
+Press [ENTER] to continue or Ctrl-c to cancel adding it.
+
+# Will also auto-perform apt update
+
+apt list --upgradable
+Listing... Done
+dell-linux-assistant/focal 2.2.0548 amd64 [upgradable from: 2.2.0544]
+
+# Upgrade
+sudo apt dist-upgrade # or
+sudo apt full-upgrade
+```
+
+### Increase `/swapfile` - Change Swapiness
+
+> swappiness
+==========
+This control is used to define how aggressive the kernel will swap memory pages. Higher values will increase aggressiveness, lower values decrease the amount of swap. A value of 0 instructs the kernel not to initiate swap until the amount of free and file-backed pages is less than the high water mark in a zone.
+The default value is 60.
+
+```bash
+# Change swapiness to 30%, some users with lots of RAM also report 0 as a smooth setting. Keep swap, if you encounter frequent memory issues/freezes.
+
+cat /proc/sys/vm/swappiness
+60
+# Temporary change
+sudo sysctl vm.swappiness=30
+vm.swappiness = 30
+# Check swapiness after change
+cat /proc/sys/vm/swappiness
+30
+# Check for potential overrides in sysctl.conf
+cat /etc/sysctl.conf
+
+# Permanent change
+sudo vim /etc/sysctl.conf
+# Add line
+vm.swappiness = 30
+# Will apply on reboot. If you want immediate apply, reload sysctl.conf:
+sudo sysctl -p/--load
+vm.swappiness = 30
+
+cat /proc/sys/vm/swappiness
+30
+```
+
+- Increase `/swapfile` (in-place, no extra partition)
+
+```bash
+# Check default swap size and files
+free -h
+              total        used        free      shared  buff/cache   available
+Mem:           15Gi       6,5Gi       833Mi       1,9Gi       8,1Gi       6,7Gi
+Swap:         2,0Gi       0,0Ki       2,0Gi
+
+swapon -s
+Filename    Type  Size Used Priority
+/swapfile                               file     2097148 0 -2
+
+ls -lh /swapfile
+-rw------- 1 root root 2,0G Οκτ  20 19:52 /swapfile
+
+# Disable swap before resize
+sudo swapoff -a
+# Write zeros over /swapfile with 8 blocks of 1G = 8Gb
+sudo dd if=/dev/zero of=/swapfile bs=1G count=8
+8+0 records in
+8+0 records out
+8589934592 bytes (8,6 GB, 8,0 GiB) copied, 17,3329 s, 496 MB/s
+# if: Input file
+# of: Output file
+# bs: Block size
+# count: Number of blocks
+
+# Mark /swapfile as swap
+sudo mkswap  /swapfile
+Setting up swapspace version 1, size = 8 GiB (8589930496 bytes)
+no label, UUID=cbe40c64-6f8a-49c7-bab7-4ebe21d53a67
+
+# Enable swap
+sudo swapon -a
+
+# Check new swap size
+grep SwapTotal /proc/meminfo
+SwapTotal:       8388604 kB
+
+free -h
+              total        used        free      shared  buff/cache   available
+Mem:           15Gi       6,1Gi       1,2Gi       1,8Gi       8,1Gi       7,1Gi
+Swap:         8,0Gi          0B       8,0Gi
 ```
 
 ## Install Productivity Tools
