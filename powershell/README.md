@@ -1891,3 +1891,11 @@ DESKTOP-SVI4OFT
 Invoke-Command -ComputerName DESKTOP-SVI4OFT -ScriptBlock {$testVar=10} -credential $cred
 Invoke-Command -ComputerName DESKTOP-SVI4OFT -ScriptBlock {$testVar} -credential $cred # output of $testVar is blank
 ```
+
+## Hints & Tips
+
+Importing a module on top of an existing module that is imported (update), use `-Force`:
+
+```Powershell
+Import-Module -Path ./MyModule/MyModule.psd1 -Force
+```

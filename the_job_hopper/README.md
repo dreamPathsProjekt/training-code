@@ -57,6 +57,7 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
       - [`tfenv` - Terraform Version Manager](#tfenv---terraform-version-manager)
     - [`chezmoi` - Dotfile management](#chezmoi---dotfile-management)
     - [ASDF Packages](#asdf-packages)
+      - [SAM CLI](#sam-cli)
       - [Kubernetes Tools](#kubernetes-tools)
   - [Developer Tweaks](#developer-tweaks)
     - [Global .gitconfig](#global-gitconfig)
@@ -1353,6 +1354,92 @@ chezmoi apply -v ~/.vimrc
   - Custom `asdf` plugin: `asdf plugin-add lazydocker https://github.com/comdotlinux/asdf-lazydocker.git`
 - `golangci-lint`: Fast linters runner for Go.
 - `k6`: The best developer experience for load testing.
+
+#### SAM CLI
+
+[AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/prerequisites.html) has some additional dependencies, before installing with `asdf`
+
+- Create a temporary Python virtualenv & Install `aws-sam-cli` via `asdf`
+
+```bash
+pyenv virtualenv 3.10.8 aws-sam-cliv
+pyenv activate aws-sam-cli
+pip install --upgrade pip
+# Add the plugin and list versions
+asdf plugin-add aws-sam-cli
+asdf list-all aws-sam-cli
+
+# Install a version, with virtualenv activated
+asdf install aws-sam-cli 1.76.0
+
+# Check for any sam pip packages installed in the virtualenv
+pip freeze
+# No dependencies should have been found
+source deactivate
+
+# AWS SAM Cli venv is inside:
+ll ~/.asdf/installs/aws-sam-cli/1.76.0/venv/
+# Output
+total 28
+drwxrwxr-x 6 1000 1000 4096 Μαρ   4 19:59 ./
+drwxrwxr-x 5 1000 1000 4096 Μαρ   4 19:59 ../
+drwxrwxr-x 3 1000 1000 4096 Μαρ   4 19:59 bin/
+drwxrwxr-x 2 1000 1000 4096 Μαρ   4 19:58 include/
+drwxrwxr-x 3 1000 1000 4096 Μαρ   4 19:58 lib/
+lrwxrwxrwx 1 1000 1000    3 Μαρ   4 19:58 lib64 -> lib/
+-rw-rw-r-- 1 1000 1000  107 Μαρ   4 19:58 pyvenv.cfg
+drwxrwxr-x 3 1000 1000 4096 Μαρ   4 19:59 share/
+
+# Check the local ~/.asdf packages
+~/.asdf/installs/aws-sam-cli/1.76.0/venv/bin/pip freeze
+# Output
+arrow==1.2.3
+attrs==22.2.0
+aws-lambda-builders==1.27.0
+aws-sam-cli==1.76.0
+aws-sam-translator==1.60.1
+binaryornot==0.4.4
+boto3==1.26.84
+botocore==1.29.84
+certifi==2022.12.7
+cffi==1.15.1
+cfn-lint==0.74.0
+chardet==4.0.0
+chevron==0.14.0
+click==8.1.3
+cookiecutter==2.1.1
+cryptography==39.0.2
+# etc ...
+
+
+# All SAM packages are installed in:
+ll ~/.asdf/installs/aws-sam-cli/1.76.0/venv/lib/python3.10/site-packages/
+
+# Set sam version globally in asdf
+asdf global aws-sam-cli 1.76.0
+```
+
+- Setup [`sam` completion](https://github.com/daisuke-awaji/sam_completion)
+
+> Note: It is however lagging in commands from recent SAM CLI versions.
+
+```bash
+# Create a user-local bash completion dir
+mkdir -vp ~/.local/etc/bash_completion.d/
+wget https://raw.githubusercontent.com/daisuke-awaji/sam_completion/master/sam_completion -P ~/.local/etc/bash_completion.d/
+
+# Add the following line to ~/.bashrc
+echo "source ~/.local/etc/bash_completion.d/sam_completion" >> ~/.bashrc
+# Activate
+source ~/.bashrc
+# Or
+exec $SHELL
+
+# If you have a portable ~/.bashrc across systems, using chezmoi, add:
+if [ -f "$HOME/.local/etc/bash_completion.d/sam_completion" ]; then
+    . "$HOME/.local/etc/bash_completion.d/sam_completion"
+fi
+```
 
 #### Kubernetes Tools
 
