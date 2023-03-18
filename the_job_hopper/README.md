@@ -73,6 +73,7 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
       - [K8s Prompt](#k8s-prompt)
       - [Jetbrains Toolbox](#jetbrains-toolbox)
       - [AWS Profiles](#aws-profiles)
+      - [Alacritty TTY Emulator](#alacritty-tty-emulator)
 
 ## Change Passwords
 
@@ -877,12 +878,14 @@ sudo apt install curl mosh silversearcher-ag
 sudo add-apt-repository ppa:mattrose/terminator
 sudo apt update
 sudo apt install terminator
+sudo apt mlocate
 ```
 
 - curl: the well known tool to perform requests to web servers
 - mosh: the mobile shell can be used for persistent ssh sessions
 - silversearcher-ag: better than grep for searching source code
 - terminator: a better terminal emulator
+- locate: a tool to locate files is multiple locations.
 
 ### VsCode
 
@@ -1620,6 +1623,21 @@ chezmoi git -- commit -m "Add .vimrc"
 chezmoi git -- push
 ```
 
+- Use the mouse
+
+```bash
+# Add on ~/.vimrc or interactively
+set mouse=a
+set ttymouse=sgr
+```
+
+- Enter vi mode in shell
+
+```bash
+# Add to ~/.bashrc
+set -o vi
+```
+
 #### K8s Prompt
 
 - [Kube PS1](https://github.com/jonmosco/kube-ps1)
@@ -1676,4 +1694,14 @@ aws ec2 describe-instances --profile legacy
 # Alternative use environment variables
 export AWS_PROFILE=legacy
 aws ec2 describe-instances
+```
+
+#### Alacritty TTY Emulator
+
+- [https://github.com/alacritty/alacritty](https://github.com/alacritty/alacritty)
+
+```bash
+sudo add-apt-repository ppa:aslatter/ppa -y
+sudo apt install alacritty
+# Configuration should be on ~/.config/alacritty/alacritty.yml
 ```
