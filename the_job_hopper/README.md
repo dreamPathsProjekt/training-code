@@ -73,7 +73,8 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
       - [K8s Prompt](#k8s-prompt)
       - [Jetbrains Toolbox](#jetbrains-toolbox)
       - [AWS Profiles](#aws-profiles)
-      - [Alacritty TTY Emulator](#alacritty-tty-emulator)
+      - [Alacritty Terminal Emulator](#alacritty-terminal-emulator)
+      - [Kitty Terminal Emulator](#kitty-terminal-emulator)
 
 ## Change Passwords
 
@@ -1696,7 +1697,7 @@ export AWS_PROFILE=legacy
 aws ec2 describe-instances
 ```
 
-#### Alacritty TTY Emulator
+#### Alacritty Terminal Emulator
 
 - [https://github.com/alacritty/alacritty](https://github.com/alacritty/alacritty)
 
@@ -1705,3 +1706,16 @@ sudo add-apt-repository ppa:aslatter/ppa -y
 sudo apt install alacritty
 # Configuration should be on ~/.config/alacritty/alacritty.yml
 ```
+
+#### Kitty Terminal Emulator
+
+- Cleanest way to [install](https://sw.kovidgoyal.net/kitty/binary/#binary-install) (no desktop icons)
+
+```bash
+curl -L https://sw.kovidgoyal.net/kitty/installer.sh | sh /dev/stdin
+```
+
+The binaries will be installed in the standard location for your OS, `/Applications/kitty.app` on macOS and `~/.local/kitty.app` on Linux. The installer __only touches files in that directory.__ To update kitty, simply re-run the command.
+
+>Warning
+Do not copy the kitty binary out of the installation folder. If you want to add it to your PATH, create a symlink in ~/.local/bin or /usr/bin or wherever. You should create a symlink for the kitten binary as well.
