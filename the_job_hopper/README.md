@@ -75,6 +75,7 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
       - [AWS Profiles](#aws-profiles)
       - [Alacritty Terminal Emulator](#alacritty-terminal-emulator)
       - [Kitty Terminal Emulator](#kitty-terminal-emulator)
+      - [Terminal Recording - Screen Key](#terminal-recording---screen-key)
 
 ## Change Passwords
 
@@ -1719,3 +1720,28 @@ The binaries will be installed in the standard location for your OS, `/Applicati
 
 >Warning
 Do not copy the kitty binary out of the installation folder. If you want to add it to your PATH, create a symlink in ~/.local/bin or /usr/bin or wherever. You should create a symlink for the kitten binary as well.
+
+#### Terminal Recording - Screen Key
+
+- [screenkey](https://gitlab.com/screenkey/screenkey) has bugs on `GTK3` (Gnome)
+
+- Install `screenkey`, `ttyrec`, `ttygif`
+
+```bash
+sudo apt update
+sudo apt install ttyrec ttygif screenkey
+```
+
+- Start `screenkey` to show keystrokes on screen, select your screen, font etc. settings:
+
+```bash
+screenkey --show-settings
+```
+
+- Stop `screenkey`
+
+```bash
+pkill -f screenkey
+```
+
+> Note: You can also use __VSCode terminal__ and F1 -> `Developer: Toggle Screencast Mode` command with better visual output.
