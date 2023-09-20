@@ -10,6 +10,8 @@
 - - Route Tables
 - - Network Gateways
 
+[VPC & Network Gateway Connectivity Options](https://docs.aws.amazon.com/whitepapers/latest/aws-vpc-connectivity-options/introduction.html)
+
 ![VPC Overview](./vpc_overview.PNG)
 
 ### Customization - Security
