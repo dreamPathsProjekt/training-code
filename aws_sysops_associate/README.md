@@ -12,7 +12,8 @@
 
 ## Links - Whitepapers
 
-[Links](./links.md)
+- [Links](./links.md)
+- [AWS Container Landscape](https://docs.aws.amazon.com/whitepapers/latest/docker-on-aws/containers-orchestrations-on-aws.html)
 
 ## Quick Notes
 
