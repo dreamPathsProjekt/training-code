@@ -1506,6 +1506,24 @@ The completion will start working on new terminals.
 
 The gpg-agent should be up and running by default.
 
+To set expiration for keys, or renew:
+
+```bash
+# List keys
+gpg --list-keys
+# Default Location /home/<user>/.gnupg/pubring.kbx
+
+gpg --edit-key 680530A9030E292271D0CC93CB7C59AD2CBEE1FD
+
+# Select key sec or ssb, interactive gpg session.
+key 0 # sec
+key 1 # ssb
+
+expire
+# Select expiration period. Save & exit.
+save
+```
+
 ### SSH Agent
 
 The ssh-agent should be up and running by default. You can add keys via the
