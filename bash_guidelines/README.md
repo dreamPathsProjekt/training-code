@@ -41,7 +41,7 @@ Repeating some of the guidelines we see often ignored:
 ## Further Resources
 
 - [Google's style guide for shell scripts](https://google.github.io/styleguide/shellguide.html)
-- [Bash Coding Style](https://opensourcelibs.com/lib/bash-coding-style)
+- [Bash Coding Style](https://github.com/icy/bash-coding-style)
 
 ```Shell
 # By default shellcheck source-path is SCRIPTDIR.
