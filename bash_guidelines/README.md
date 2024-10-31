@@ -11,7 +11,7 @@
     - [Avoid colors](#avoid-colors)
     - [Prefer simple code](#prefer-simple-code)
     - [Splitting long lines](#splitting-long-lines)
-    - [Variable & Function names](#variable--function-names)
+    - [Variable and Function names](#variable-and-function-names)
     - [Variable Scope](#variable-scope)
     - [Handling Positional arguments](#handling-positional-arguments)
     - [Handling Optional arguments and flags](#handling-optional-arguments-and-flags)
@@ -26,7 +26,7 @@ Our guidelines for bash are aligned with [Google's style guide for shell scripts
 - Initialize scripts with `!#/usr/bin/env bash`
 - We use four spaces for indentation instead of two.
 - We are not as strict to the maximum line length.
-- We do not require the _main_ function
+- We do not require the `_main_` function
 - We advise to avoid arrays if possible
 
 Repeating some of the guidelines we see often ignored:
@@ -35,8 +35,7 @@ Repeating some of the guidelines we see often ignored:
 - Be aware of stderr and stdout and use them properly
 - Only the `$()` notation is allowed, backticks must be avoided
 - For readability purposes, each function can include 2 lines spacing at before it's start and after it's end points.
-- Use shellcheck to verify your script. You might even want to run it as part of
-  the CICD
+- Use shellcheck to verify your script. You might even want to run it as part of the CICD.
 - Use `shellcheck -x` when your script includes `source` commands (imports), to allow importing external files. Example:
 
 ## Further Resources
@@ -164,9 +163,7 @@ They are fun at start but soon become complex and make reading code harder.
 
 ### Prefer simple code
 
-Bash scripts should be accessible to all Lensiors. Whilst SREs are capable of
-using advanced features sometimes it is more prudent to go the simple, albeit a
-bit longer way, to make our script more readable and maintainable.
+Bash scripts should be accessible to all enginners in an organization. Whilst SREs/DevOps/IT are capable of using advanced features sometimes it is more prudent to go the simple, albeit a bit longer way, to make our script more readable and maintainable.
 
 An example would be to prefer the easier to understand form:
 
@@ -203,7 +200,7 @@ curl -s "$_url" | \
     echo "Finished"
 ```
 
-### Variable & Function names
+### Variable and Function names
 
 By convention the following naming rules are advised to be applied, to improve codebase consistency & readability:
 

@@ -668,7 +668,7 @@ sudo apt update
 
 ### Zoom
 
-There are two way to install Zoom, via the deb package and via snap. With the
+There are two ways to install Zoom, via the deb package and via snap. With the
 deb package you have to perform updates manually but the application is more
 performant.  With snap you get automatic updates but zoom is slower to start and
 sometimes the camera does not work.
