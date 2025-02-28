@@ -59,6 +59,8 @@ This guide is meant to be followed top to bottom, skipping the parts you may not
     - [ASDF Packages](#asdf-packages)
       - [SAM CLI](#sam-cli)
       - [Kubernetes Tools](#kubernetes-tools)
+    - [Taskfile.dev](#taskfiledev)
+      - [Installation](#installation)
   - [Developer Tweaks](#developer-tweaks)
     - [Global .gitconfig](#global-gitconfig)
     - [Bash completion](#bash-completion)
@@ -1461,6 +1463,34 @@ fi
 - `mizu`: The Kubernetes packet tracing tool. Not on `asdf`
 - `eksctl`: The AWS EKS cli.
 - `kubebuilder`: Kubebuilder is a framework for building Kubernetes APIs using custom resource definitions (`CRDs`).
+- `helm-diff`: Helm plugin with similar functionality as `kube diff` for helm releases.
+- `helmfile`: Hemfile orchestration for Helm Releases.
+- `devpod`: [DevPod allows you to spin up dev environments based on the devcontainer.json.](https://devpod.sh/) Not on `asdf`
+
+### Taskfile.dev
+
+[Task is a task runner / build tool that aims to be simpler and easier to use than, for example, GNU Make.](https://taskfile.dev/)
+
+#### Installation
+
+[Releases Binaries](https://github.com/go-task/task/releases)
+
+```shell
+ mkdir -vp taskfile-install
+wget wget https://github.com/go-task/task/releases/download/v3.41.0/task_linux_amd64.tar.gz
+tar -xvzf task_linux_amd64.tar.gz -C taskfile-install
+
+# Bin Setup for Current user
+mv -v task ~/.local/bin/
+# Cleanup
+rm -vf taskfile-install
+rm -vf task_linux_amd64.tar.gz
+
+# Bash Completion - add the following to ~/.bashrc
+if [ -f "$HOME/.local/bin/task" ]; then
+    source <(task --completion bash)
+fi
+```
 
 ## Developer Tweaks
 
