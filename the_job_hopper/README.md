@@ -1483,7 +1483,7 @@ tar -xvzf task_linux_amd64.tar.gz -C taskfile-install
 # Bin Setup for Current user
 mv -v task ~/.local/bin/
 # Cleanup
-rm -vf taskfile-install
+rm -vrf taskfile-install
 rm -vf task_linux_amd64.tar.gz
 
 # Bash Completion - add the following to ~/.bashrc
